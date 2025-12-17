@@ -59,20 +59,14 @@ export default function LoginPage() {
         }),
       });
 
+      // Read the response once
+      const data = await res.json();
+
       if (!res.ok) {
-        let errorMessage = "Invalid code";
-        try {
-          const data = await res.json();
-          errorMessage = data.error || errorMessage;
-        } catch {
-          // If JSON parsing fails, use default error message
-        }
-        setError(errorMessage);
+        setError(data.error || "Invalid code");
         setLoading(false);
         return;
       }
-
-      const data = await res.json();
 
       if (data.success) {
         // Reset loading before redirect to prevent stuck state
@@ -86,7 +80,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error("Error:", err);
-      setError("Connection error");
+      setError("Connection error. Please try again.");
       setLoading(false);
     }
   };
