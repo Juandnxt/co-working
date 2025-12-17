@@ -29,12 +29,6 @@ const sql = postgres(connectionString, {
   idle_timeout: 20, // Close idle connections after 20 seconds
   connect_timeout: 10, // Connection timeout
   onnotice: () => {}, // Suppress notices
-  // Force IPv4 to avoid IPv6 resolution issues
-  host_type: 'tcp',
-  // Try to resolve hostname to IPv4
-  transform: {
-    undefined: null
-  },
   debug: (connection, query, parameters) => {
     if (process.env.NODE_ENV === 'development') {
       console.log('🔍 DB Query:', query);
