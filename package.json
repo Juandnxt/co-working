@@ -4,23 +4,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 5000",
-    "dev:setup": "prisma generate && prisma db push --accept-data-loss && npm run dev",
     "dev:only": "next dev -p 5000",
-    "build": "prisma generate && next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "db:generate": "prisma generate",
-    "db:push": "prisma db push",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
     "clean": "Remove-Item -Path .next -Recurse -Force -ErrorAction SilentlyContinue"
   },
   "dependencies": {
-    "@prisma/client": "^5.19.0",
     "bcryptjs": "^2.4.3",
     "next": "16.0.10",
     "next-intl": "^4.6.1",
     "nodemailer": "^7.0.7",
+    "postgres": "^3.4.7",
     "react": "19.2.1",
     "react-dom": "19.2.1",
     "zod": "^3.23.8"
@@ -34,7 +29,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
-    "prisma": "^5.19.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

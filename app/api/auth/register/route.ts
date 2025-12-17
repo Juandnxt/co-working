@@ -14,10 +14,10 @@ export async function POST(request: NextRequest) {
     const { email, password, name } = registerSchema.parse(body);
 
     // Check if user already exists
-    const { prisma } = await import("@/lib/prisma");
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    const sql = (await import("@/lib/db")).default;
+    const [existingUser] = await sql`
+      SELECT id FROM "User" WHERE email = ${email} LIMIT 1
+    `;
 
     if (existingUser) {
       return NextResponse.json(

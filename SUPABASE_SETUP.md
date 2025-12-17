@@ -18,13 +18,23 @@ This guide will help you configure Supabase as your database for the CoWorking a
 
 The connection string will look like:
 ```
-postgresql://postgres.bmnhvvnsdfpkgaumhmtp:[YOUR-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres
+postgresql://postgres.bmnhvvnsdfpkgaumhmtp:[YOUR-PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
 ```
 
 **Important:**
 - Replace `[YOUR-PASSWORD]` with your actual database password
 - The password is the one you set when creating the Supabase project
 - If you forgot it, you can reset it in Settings > Database > Database password
+- **DO NOT include `postgres:` before the password** - the format is `postgres.[PROJECT_REF]:[PASSWORD]`
+
+## Correct Format
+
+Your connection string should be:
+```
+postgresql://postgres.bmnhvvnsdfpkgaumhmtp:46lkmariano12345A!@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+```
+
+**Note:** The format is `postgres.[PROJECT_REF]:[PASSWORD]` - NOT `postgres:postgres:[PASSWORD]`
 
 ## Step 2: Get Your API Key
 
@@ -39,8 +49,8 @@ Add these to your `.env` file:
 
 ```env
 # Supabase Database Connection String
-# Format: postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
-SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:your-password@aws-0-us-east-1.pooler.supabase.com:6543/postgres"
+# Format: postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:46lkmariano12345A!@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 
 # Supabase Project URL
 SUPABASE_PROJECT_URL="https://bmnhvvnsdfpkgaumhmtp.supabase.co"
@@ -81,17 +91,19 @@ You can verify by:
 
 ### Connection Pooling (Recommended for Next.js)
 ```
-postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:6543/postgres
+postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?pgbouncer=true
 ```
 - Port: `6543`
 - Use this for production and serverless environments
+- Includes `?pgbouncer=true` for connection pooling
 
 ### Direct Connection (Alternative)
 ```
-postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.com:5432/postgres
+postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
 ```
 - Port: `5432`
 - Use this for local development if pooling doesn't work
+- Remove `?pgbouncer=true` for direct connections
 
 ## Troubleshooting
 
@@ -99,10 +111,19 @@ postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.co
 - Verify your connection string is correct
 - Check that your IP is allowed in Supabase Dashboard > Settings > Database > Connection pooling
 - Try using the direct connection format (port 5432)
+- Make sure the password doesn't have special characters that need URL encoding
 
 ### Error: "Password authentication failed"
 - Verify your database password is correct
 - You can reset it in Settings > Database > Database password
+- Make sure there are no extra spaces in the connection string
+- If your password has special characters, they may need to be URL encoded (e.g., `!` becomes `%21`)
+
+### Error: "EPERM: operation not permitted"
+- This is a Windows file permission issue, not a database connection issue
+- Close any programs that might be using Prisma (VS Code, terminal, etc.)
+- Try running the command as administrator
+- Or restart your computer and try again
 
 ### Error: "Relation does not exist"
 - Run `npm run db:push` to create the tables
@@ -112,6 +133,22 @@ postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-0-[REGION].pooler.supabase.co
 - Make sure you're looking in the correct schema (usually `public`)
 - Refresh the Table Editor in Supabase Dashboard
 - Check the Supabase logs for any errors
+
+## URL Encoding Special Characters
+
+If your password contains special characters, you may need to URL encode them:
+
+- `!` → `%21`
+- `@` → `%40`
+- `#` → `%23`
+- `$` → `%24`
+- `%` → `%25`
+- `&` → `%26`
+- `*` → `%2A`
+- `+` → `%2B`
+- `=` → `%3D`
+
+Example: If your password is `mypass!123`, use `mypass%21123` in the connection string.
 
 ## Security Notes
 
@@ -128,4 +165,3 @@ After setting up Supabase:
 2. Try registering a new user
 3. Check Supabase Dashboard > Table Editor to see the data
 4. Monitor your database usage in Supabase Dashboard
-

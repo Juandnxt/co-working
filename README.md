@@ -16,7 +16,7 @@ A modern coworking space management application built with Next.js, featuring us
 ## Tech Stack
 
 - **Framework**: Next.js 16
-- **Database**: Supabase (PostgreSQL) with Prisma ORM
+- **Database**: Supabase (PostgreSQL) with direct SQL queries
 - **Authentication**: NextAuth.js with custom 2FA
 - **Email**: Nodemailer with Gmail
 - **Payments**: Stripe
@@ -99,6 +99,7 @@ The application will be available at `http://localhost:5000`
 
 ## Documentation
 
+- [Supabase Connection Guide](./SUPABASE_CONNECTION_GUIDE.md) - **START HERE** - Step-by-step connection guide
 - [Supabase Setup](./SUPABASE_SETUP.md) - Complete Supabase configuration guide
 - [Environment Setup](./ENV_SETUP.md) - Detailed environment variable configuration
 - [Email Setup](./EMAIL_SETUP.md) - Email system configuration and troubleshooting
@@ -134,10 +135,7 @@ prisma/
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run start` - Start production server
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:push` - Push schema to database
-- `npm run db:migrate` - Create database migration
-- `npm run db:studio` - Open Prisma Studio
+- `npm run lint` - Run ESLint
 
 ## Booking System
 

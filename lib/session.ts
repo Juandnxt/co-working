@@ -1,18 +1,17 @@
 import { cookies } from 'next/headers';
-import { prisma } from './prisma';
+import sql from './db';
+import { generateId } from './db';
 
 export async function createSession(userId: string) {
   const sessionToken = crypto.randomUUID();
   const expires = new Date();
-  expires.setDate(expires.getDate() + 30); // 30 días
+  expires.setDate(expires.getDate() + 30); // 30 days
 
-  await prisma.session.create({
-    data: {
-      sessionToken,
-      userId,
-      expires,
-    },
-  });
+  const sessionId = generateId();
+  await sql`
+    INSERT INTO "Session" (id, "sessionToken", "userId", expires, "createdAt", "updatedAt")
+    VALUES (${sessionId}, ${sessionToken}, ${userId}, ${expires}, NOW(), NOW())
+  `;
 
   const cookieStore = await cookies();
   cookieStore.set('session', sessionToken, {
@@ -33,20 +32,24 @@ export async function getSession() {
     return null;
   }
 
-  const session = await prisma.session.findUnique({
-    where: { sessionToken },
-    include: { user: true },
-  });
+  const [session] = await sql`
+    SELECT s.*, u.id as user_id, u.email as user_email, u.name as user_name
+    FROM "Session" s
+    INNER JOIN "User" u ON s."userId" = u.id
+    WHERE s."sessionToken" = ${sessionToken}
+      AND s.expires > NOW()
+    LIMIT 1
+  `;
 
-  if (!session || session.expires < new Date()) {
+  if (!session) {
     return null;
   }
 
   return {
     user: {
-      id: session.user.id,
-      email: session.user.email,
-      name: session.user.name,
+      id: session.user_id,
+      email: session.user_email,
+      name: session.user_name,
     },
   };
 }
@@ -56,11 +59,11 @@ export async function deleteSession() {
   const sessionToken = cookieStore.get('session')?.value;
   
   if (sessionToken) {
-    await prisma.session.deleteMany({
-      where: { sessionToken },
-    });
+    await sql`
+      DELETE FROM "Session"
+      WHERE "sessionToken" = ${sessionToken}
+    `;
   }
 
   cookieStore.delete('session');
 }
-
