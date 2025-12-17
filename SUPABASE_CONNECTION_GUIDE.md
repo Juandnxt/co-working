@@ -32,10 +32,6 @@ SUPABASE_PROJECT_URL=https://bmnhvvnsdfpkgaumhmtp.supabase.co
 # Supabase API Key (get from Supabase Dashboard > Settings > API)
 SUPABASE_API_KEY=your-api-key-here
 
-# NextAuth
-NEXTAUTH_URL=http://localhost:5000
-NEXTAUTH_SECRET=your-nextauth-secret-key-here
-
 # Gmail Configuration
 GMAIL_USER=your-email@gmail.com
 GMAIL_APP_PASSWORD=your-gmail-app-password

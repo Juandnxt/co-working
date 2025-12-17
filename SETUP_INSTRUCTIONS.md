@@ -41,10 +41,6 @@ SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:[YOUR-PASSWORD]@aws-0-[
 SUPABASE_PROJECT_URL="https://bmnhvvnsdfpkgaumhmtp.supabase.co"
 SUPABASE_API_KEY="your-supabase-api-key"
 
-# NextAuth
-NEXTAUTH_URL="http://localhost:5000"
-NEXTAUTH_SECRET="generate-a-secret-key-here"
-
 # Gmail Configuration
 GMAIL_USER="your-email@gmail.com"
 GMAIL_APP_PASSWORD="your-app-password"
@@ -52,11 +48,6 @@ GMAIL_APP_PASSWORD="your-app-password"
 # Stripe
 STRIPE_SECRET_KEY="sk_test_your_secret_key"
 NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_your_public_key"
-```
-
-**To generate NEXTAUTH_SECRET:**
-```bash
-openssl rand -base64 32
 ```
 
 **To get GMAIL_APP_PASSWORD:**

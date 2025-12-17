@@ -17,7 +17,7 @@ A modern coworking space management application built with Next.js, featuring us
 
 - **Framework**: Next.js 16
 - **Database**: Supabase (PostgreSQL) with direct SQL queries
-- **Authentication**: NextAuth.js with custom 2FA
+- **Authentication**: Custom 2FA with email verification
 - **Email**: Nodemailer with Gmail
 - **Payments**: Stripe
 - **Styling**: Tailwind CSS
@@ -56,10 +56,6 @@ SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:[YOUR-PASSWORD]@aws-0-[
 SUPABASE_PROJECT_URL="https://bmnhvvnsdfpkgaumhmtp.supabase.co"
 SUPABASE_API_KEY="your-supabase-api-key"
 
-# NextAuth
-NEXTAUTH_URL="http://localhost:5000"
-NEXTAUTH_SECRET="your-nextauth-secret-key-here"
-
 # Gmail Configuration
 GMAIL_USER="your-email@gmail.com"
 GMAIL_APP_PASSWORD="your-gmail-app-password"
@@ -75,12 +71,7 @@ NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_test_your_publishable_key"
    - Run the SQL schema: Copy `database/schema.sql` and run it in Supabase SQL Editor
    - See [SUPABASE_CONNECTION_GUIDE.md](./SUPABASE_CONNECTION_GUIDE.md) for detailed step-by-step instructions
 
-5. Generate NextAuth secret:
-```bash
-openssl rand -base64 32
-```
-
-6. Run the development server:
+5. Run the development server:
 ```bash
 npm run dev
 ```
@@ -112,12 +103,12 @@ app/
 
 lib/
 ├── auth.ts           # Authentication helpers
+├── db.ts             # Database connection
 ├── email.ts          # Email sending functions
-├── prisma.ts         # Prisma client
 └── session.ts        # Session management
 
-prisma/
-└── schema.prisma     # Database schema
+database/
+└── schema.sql        # Database schema
 ```
 
 ## Available Scripts
