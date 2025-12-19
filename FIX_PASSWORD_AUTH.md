@@ -114,3 +114,5 @@ To verify your connection string is correct, you can test it:
 3. Try running a simple query - if it works, your connection string is correct
 4. If it fails, check the error message for clues
 
+
+

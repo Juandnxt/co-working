@@ -133,7 +133,7 @@ export async function verifyCode(email: string, code: string) {
 export async function loginUser(email: string, password: string) {
   // Find user by email
   const [user] = await sql`
-    SELECT id, email, name, password, "emailVerified"
+    SELECT id, email, name, password, "emailVerified", role
     FROM "User"
     WHERE email = ${email}
     LIMIT 1
@@ -154,7 +154,7 @@ export async function loginUser(email: string, password: string) {
   }
 
   // Return user directly - no 2FA needed for login
-  return { user: { id: user.id, email: user.email, name: user.name } };
+  return { user: { id: user.id, email: user.email, name: user.name, role: user.role || 'user' } };
 }
 
 export async function verifyLoginCode(email: string, code: string) {

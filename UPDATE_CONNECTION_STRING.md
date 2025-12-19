@@ -110,3 +110,5 @@ SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:Mattyykenet1@aws-0-us-w
 
 Replace with YOUR region and password!
 
+
+

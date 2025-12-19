@@ -36,6 +36,18 @@ export default function LoginPage() {
         return;
       }
 
+      if (data.success) {
+        // Redirect based on user role
+        setLoading(false);
+        if (data.isAdmin) {
+          window.location.href = `/${locale}/admin/dashboard`;
+        } else {
+          router.push(`/${locale}`);
+          router.refresh();
+        }
+        return;
+      }
+
       setStep("code");
     } catch (err) {
       setError(t("auth.connectionError"));

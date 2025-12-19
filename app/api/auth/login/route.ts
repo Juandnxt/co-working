@@ -37,6 +37,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: "Login successful",
       user: result.user,
+      isAdmin: result.user.role === 'admin',
     });
   } catch (error) {
     if (error instanceof z.ZodError) {

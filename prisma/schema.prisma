@@ -20,12 +20,14 @@ model User {
   password      String
   emailVerified DateTime?
   twoFactorEnabled Boolean @default(false)
+  role          String    @default("user") // "user" or "admin"
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   
   sessions      Session[]
   verificationCodes VerificationCode[]
   bookings      Booking[]
+  subscriptions Subscription[]
 }
 
 model Session {
@@ -60,6 +62,42 @@ model Booking {
   status        String   @default("pending") // pending, confirmed, cancelled
   paymentStatus String   @default("pending") // pending, paid, refunded
   amount        Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Subscription {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan          String   // basic, premium, enterprise
+  status        String   @default("active") // active, cancelled, expired
+  startDate     DateTime @default(now())
+  endDate       DateTime?
+  amount        Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Space {
+  id            String   @id @default(cuid())
+  name          String
+  type          String   // abierto, privada, reunion, eventos
+  capacity      Int
+  price         Float
+  available     Boolean  @default(true)
+  description   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Schedule {
+  id            String   @id @default(cuid())
+  spaceId       String?
+  dayOfWeek     Int      // 0-6 (Sunday-Saturday)
+  openTime      String   // HH:mm format
+  closeTime     String   // HH:mm format
+  isOpen        Boolean  @default(true)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

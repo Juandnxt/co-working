@@ -95,3 +95,5 @@ SUPABASE_URL="postgresql://postgres.bmnhvvnsdfpkgaumhmtp:Mattyykenet1@aws-0-eu-c
 
 **Note:** Replace `eu-central-1` with your actual region, and `Mattyykenet1` with your actual password.
 
+
+

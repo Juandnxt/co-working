@@ -34,8 +34,12 @@ export default function LoginPage() {
       if (data.success) {
         // Reset loading before redirect
         setLoading(false);
-        // Redirect to homepage
-        window.location.href = "/";
+        // Redirect based on user role
+        if (data.isAdmin) {
+          window.location.href = "/admin/dashboard";
+        } else {
+          window.location.href = "/";
+        }
       } else {
         setError(data.error || "Login failed");
         setLoading(false);

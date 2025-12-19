@@ -33,7 +33,7 @@ export async function getSession() {
   }
 
   const [session] = await sql`
-    SELECT s.*, u.id as user_id, u.email as user_email, u.name as user_name
+    SELECT s.*, u.id as user_id, u.email as user_email, u.name as user_name, u.role as user_role
     FROM "Session" s
     INNER JOIN "User" u ON s."userId" = u.id
     WHERE s."sessionToken" = ${sessionToken}
@@ -50,6 +50,7 @@ export async function getSession() {
       id: session.user_id,
       email: session.user_email,
       name: session.user_name,
+      role: session.user_role || 'user',
     },
   };
 }
