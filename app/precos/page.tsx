@@ -1,10 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
+import { useMemo, useState } from "react";
+
 const services = [
   {
     name: "Day Pass",
     price: "20€ / dia (+ IVA)",
+    imageSrc:
+      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Trabalho em open space",
     details: [
       "Acesso a áreas comuns e open space.",
       "Wi-Fi de alta velocidade.",
@@ -25,6 +30,9 @@ const services = [
   {
     name: "Week Pass",
     price: "75€ / semana (+ IVA)",
+    imageSrc:
+      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Espaço moderno de coworking",
     details: [
       "Lugar rotativo 5 dias seguidos em mesa partilhada.",
       "Wi-Fi rápido e zonas lounge.",
@@ -45,6 +53,9 @@ const services = [
   {
     name: "Half-Day Flex (Manhã/Tarde)",
     price: "12€ / meio-dia (+ IVA)",
+    imageSrc:
+      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Ambiente de trabalho calmo",
     details: [
       "Lugar rotativo em zona partilhada.",
       "Wi-Fi rápido e zonas lounge.",
@@ -68,6 +79,9 @@ const services = [
   {
     name: "Flex Desk (Mesa Partilhada) · Mensal",
     price: "160€ / mês (+ IVA)",
+    imageSrc:
+      "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Mesa partilhada para trabalhar",
     details: [
       "Acesso dias úteis 09h-19h.",
       "Lugar rotativo em open space.",
@@ -87,6 +101,9 @@ const services = [
   {
     name: "Fixed Desk (Mesa Dedicada) · Mensal",
     price: "220€ / mês (+ IVA)",
+    imageSrc:
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Secretária dedicada com conforto",
     details: [
       "Posto dedicado com cadeira ergonómica.",
       "Acesso 24/7.",
@@ -107,6 +124,9 @@ const services = [
   {
     name: "Escritório Virtual · Mensal",
     price: "45€ / mês (+ IVA)",
+    imageSrc:
+      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Trabalho remoto e morada fiscal",
     details: [
       "Morada fiscal e comercial em Vila Nova de Gaia.",
       "Receção de correio/encomendas e notificação por email.",
@@ -127,6 +147,9 @@ const services = [
   {
     name: "Sala de Reuniões",
     price: "18€ / 1h (+ IVA) · 32€ / 2h (+ IVA)",
+    imageSrc:
+      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+    imageAlt: "Sala de reuniões moderna",
     details: [
       "Sala equipada (ecrã/TV ou projeção) com Wi-Fi rápido.",
       "Água/café incluídos.",
@@ -151,6 +174,10 @@ const notes = [
 ];
 
 export default function PrecosPage() {
+  const [openKey, setOpenKey] = useState<string | null>(null);
+
+  const items = useMemo(() => services, []);
+
   return (
     <div className="bg-[#F7F7F5] min-h-screen text-[#1A1A1A]">
       <section className="container mx-auto px-5 py-12 lg:py-16">
@@ -165,67 +192,150 @@ export default function PrecosPage() {
       </section>
 
       <section className="container mx-auto px-5 pb-12 lg:pb-16 space-y-6">
-        {services.map((service) => (
-          <div
-            key={service.name}
-            className="rounded-[28px] bg-white shadow-soft border border-black/5 p-6 lg:p-8 space-y-4"
-          >
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <h2 className="text-2xl font-extrabold">{service.name}</h2>
-              <span className="inline-flex items-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-soft">
-                {service.price}
-              </span>
-            </div>
-            <div className="grid gap-4 lg:grid-cols-3">
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">Inclui</p>
-                <ul className="space-y-2 text-sm text-black/80">
-                  {service.details.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <span className="mt-1 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">Não inclui</p>
-                <ul className="space-y-2 text-sm text-black/80">
-                  {service.excludes.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <span className="mt-1 h-2 w-2 rounded-full bg-black/25" aria-hidden />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">Condições</p>
-                <ul className="space-y-2 text-sm text-black/80">
-                  {service.conditions.map((item) => (
-                    <li key={item} className="flex gap-2">
-                      <span className="mt-1 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </div>
-        ))}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {items.map((service) => {
+            const isOpen = openKey === service.name;
+            return (
+              <article
+                key={service.name}
+                className="group rounded-[28px] bg-white border border-black/5 shadow-soft overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition"
+              >
+                <div className="relative aspect-[16/10] bg-black/5">
+                  <img
+                    src={service.imageSrc}
+                    alt={service.imageAlt}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0" />
+                  <div className="absolute left-4 bottom-4 right-4 flex items-end justify-between gap-3">
+                    <h2 className="text-lg font-extrabold text-white leading-tight drop-shadow">
+                      {service.name}
+                    </h2>
+                    <span className="shrink-0 inline-flex items-center rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#1A1A1A] shadow-soft">
+                      {service.price}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 mb-3">
+                    Destaques
+                  </p>
+                  <ul className="space-y-2 text-sm text-black/80">
+                    {service.details.slice(0, 3).map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="mt-5 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setOpenKey((prev) => (prev === service.name ? null : service.name))}
+                      className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#F7F7F5] transition"
+                      aria-expanded={isOpen}
+                    >
+                      {isOpen ? "Fechar detalhes" : "Ver detalhes"}
+                      <svg
+                        className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        aria-hidden
+                      >
+                        <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+
+                    <a
+                      href="mailto:hello@gaiacoworking.pt"
+                      className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:shadow-md transition-shadow"
+                    >
+                      Reservar
+                    </a>
+                  </div>
+
+                  {isOpen && (
+                    <div className="mt-5 space-y-4 border-t border-black/5 pt-5">
+                      <div className="space-y-2">
+                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
+                          Inclui
+                        </p>
+                        <ul className="space-y-2 text-sm text-black/80">
+                          {service.details.map((item) => (
+                            <li key={item} className="flex gap-2">
+                              <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
+                            Não inclui
+                          </p>
+                          <ul className="space-y-2 text-sm text-black/80">
+                            {service.excludes.map((item) => (
+                              <li key={item} className="flex gap-2">
+                                <span className="mt-1.5 h-2 w-2 rounded-full bg-black/25" aria-hidden />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
+                            Condições
+                          </p>
+                          <ul className="space-y-2 text-sm text-black/80">
+                            {service.conditions.map((item) => (
+                              <li key={item} className="flex gap-2">
+                                <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
+                                <span>{item}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
       </section>
 
       <section className="container mx-auto px-5 pb-16">
-        <div className="rounded-[24px] bg-blue-50 border border-blue-200 p-6 lg:p-8 shadow-soft space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">Notas gerais</p>
-          <ul className="space-y-2 text-sm text-black/80">
-            {notes.map((item) => (
-              <li key={item} className="flex gap-2">
-                <span className="mt-1 h-2 w-2 rounded-full bg-[#D7B34A]" aria-hidden />
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
+        <div className="rounded-[28px] bg-white border border-black/5 shadow-soft overflow-hidden">
+          <div className="px-6 py-5 lg:px-8 lg:py-6 border-b border-black/5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
+              Notas gerais
+            </p>
+            <p className="mt-2 text-base font-semibold text-black/80">
+              Detalhes importantes sobre horários, silêncio e faturação.
+            </p>
+          </div>
+          <div className="px-6 py-6 lg:px-8 lg:py-7">
+            <ul className="grid gap-3 md:grid-cols-2 text-sm text-black/80">
+              {notes.map((item) => (
+                <li key={item} className="flex gap-3 rounded-2xl bg-[#F7F7F5] p-4 border border-black/5">
+                  <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-soft shrink-0">
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
+                      <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" />
+                    </svg>
+                  </span>
+                  <span className="leading-relaxed">{item}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </section>
     </div>

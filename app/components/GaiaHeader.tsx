@@ -2,6 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { locales } from "@/i18n";
 
 type Props = {
   basePath?: string;
@@ -17,7 +19,14 @@ const buildNavLinks = (basePath: string) => [
 
 export default function GaiaHeader({ basePath = "" }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const navLinks = buildNavLinks(basePath);
+  const pathname = usePathname() || "/";
+  const autoBasePath = (() => {
+    if (basePath) return basePath;
+    const seg = pathname.split("/").filter(Boolean)[0];
+    return seg && (locales as readonly string[]).includes(seg) ? `/${seg}` : "";
+  })();
+
+  const navLinks = buildNavLinks(autoBasePath);
 
   useEffect(() => {
     const onResize = () => {
@@ -30,7 +39,7 @@ export default function GaiaHeader({ basePath = "" }: Props) {
   return (
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-black/5">
       <div className="container mx-auto flex items-center justify-between px-5 py-4 lg:py-5">
-        <a href={`${basePath || "/"}`} className="flex items-center gap-3" aria-label="Voltar à página inicial">
+        <a href={`${autoBasePath || "/"}`} className="flex items-center gap-3" aria-label="Voltar à página inicial">
           <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 shadow-soft flex items-center justify-center text-xl font-bold text-white">
             GC
           </div>
@@ -56,7 +65,7 @@ export default function GaiaHeader({ basePath = "" }: Props) {
             <span className="px-1 text-black/60">EN</span>
           </div>
           <a
-            href={`${basePath}/login`.replace("//", "/")}
+            href={`${autoBasePath}/login`.replace("//", "/")}
             className="hidden sm:inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] shadow-soft hover:bg-[#F7F7F5] transition"
           >
             Login
@@ -103,14 +112,14 @@ export default function GaiaHeader({ basePath = "" }: Props) {
             </div>
             <div className="flex flex-col gap-2">
               <a
-                href={`${basePath}/login`.replace("//", "/")}
+                href={`${autoBasePath}/login`.replace("//", "/")}
                 className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-3 text-sm font-semibold text-[#1A1A1A] shadow-soft"
                 onClick={() => setMenuOpen(false)}
               >
                 Login
               </a>
               <a
-                href={`${basePath}/#day-pass`.replace("//", "/")}
+                href={`${autoBasePath}/#day-pass`.replace("//", "/")}
                 className="inline-flex items-center justify-center rounded-full border border-blue-600 px-4 py-3 text-sm font-semibold text-blue-700 shadow-soft"
                 onClick={() => setMenuOpen(false)}
               >

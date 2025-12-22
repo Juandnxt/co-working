@@ -3,6 +3,7 @@ import { Poppins, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import GaiaHeader from "./components/GaiaHeader";
+import SiteFooter from "./components/SiteFooter";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -33,8 +34,11 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <GaiaHeader />
-          <main>{children}</main>
+          <div className="min-h-screen flex flex-col">
+            <GaiaHeader />
+            <main className="flex-1">{children}</main>
+            <SiteFooter />
+          </div>
         </Providers>
       </body>
     </html>

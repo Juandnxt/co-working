@@ -3,7 +3,6 @@ import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Poppins } from "next/font/google";
 import { locales } from '@/i18n';
-import GaiaHeader from '../components/GaiaHeader';
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -39,7 +38,6 @@ export default async function LocaleLayout({
   return (
     <div className={poppins.className}>
       <NextIntlClientProvider messages={messages} locale={locale}>
-        <GaiaHeader basePath={`/${locale}`} />
         <main>{children}</main>
       </NextIntlClientProvider>
     </div>
