@@ -1,4 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
+import ChatWidget from "./components/ChatWidget";
 const heroImage =
   "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1800&q=80";
 
@@ -8,7 +9,7 @@ const galleryTop = [
 ];
 
 const galleryBottom = [
-  "https://images.unsplash.com/photo-1521737604893-ff8c1df43f6f?auto=format&fit=crop&w=900&q=80",
+  "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=900&q=80",
   "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=900&q=80",
   "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80",
   "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=900&q=80",
@@ -136,13 +137,6 @@ export default function Home() {
                 <img
                   src="https://images.unsplash.com/photo-1521737604893-ff8c1df43f6f?auto=format&fit=crop&w=1400&q=80"
                   alt="Lounge Gaia Coworking"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-10 -left-8 hidden md:block w-2/3 rounded-[28px] overflow-hidden shadow-soft">
-                <img
-                  src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=1200&q=80"
-                  alt="Comunidade a trabalhar"
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -331,17 +325,7 @@ export default function Home() {
         </section>
       </main>
 
-      <a
-        href="https://wa.me/351000000000"
-        className="fixed bottom-6 right-6 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-black/20 hover:translate-y-[-2px] transition"
-        target="_blank"
-        rel="noreferrer"
-      >
-        <svg className="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-          <path d="M12 2a9.93 9.93 0 00-9.95 9.93 9.86 9.86 0 001.35 5l-1.4 5.12 5.2-1.36a10 10 0 004.8 1.23h.02A9.93 9.93 0 1012 2zm5.64 14.48c-.24.67-1.4 1.27-1.93 1.33-.5.05-1.1.05-1.77-.11a8.28 8.28 0 01-3.63-1.94 9.56 9.56 0 01-1.86-2.3 4.17 4.17 0 01-.87-2.3c0-.67.33-1.1.47-1.27.13-.16.29-.2.39-.2h.28c.09 0 .21 0 .32.25.11.24.36.84.39.9.03.07.05.14.01.22-.16.33-.34.45-.25.67.33.82 1.53 1.96 2.33 2.34.16.08.26.07.36-.04.1-.12.43-.51.55-.69.13-.17.23-.14.39-.08.16.05 1.02.48 1.2.57.18.09.29.14.33.22.04.08.04.74-.2 1.41z" />
-        </svg>
-        WhatsApp
-      </a>
+      <ChatWidget />
     </div>
   );
 }
