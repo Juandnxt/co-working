@@ -24,7 +24,8 @@ try {
   console.log('✅ Variables de entorno cargadas desde .env');
 } catch (error) {
   console.warn('⚠️  No se pudo cargar .env, usando variables de entorno del sistema');
-  if ((error as any).code === 'ENOENT') {
+  const err = error as NodeJS.ErrnoException;
+  if (err.code === 'ENOENT') {
     console.error('❌ Archivo .env no encontrado. Asegúrate de que existe en la raíz del proyecto.');
   }
 }

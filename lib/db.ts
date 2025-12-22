@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === 'development') {
       console.warn('⚠️ WARNING: Username should be "postgres.bmnhvvnsdfpkgaumhmtp", not just "postgres"');
       console.warn('   Get the correct connection string from Supabase Dashboard > Settings > Database > Connection pooling');
     }
-  } catch (e) {
+  } catch {
     console.warn('⚠️ Could not parse connection string');
   }
 }

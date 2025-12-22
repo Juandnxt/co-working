@@ -1,11 +1,10 @@
 "use client";
 
 import { useTranslations, useLocale } from "next-intl";
-import Link from "next/link";
 
 export default function Footer() {
   const t = useTranslations();
-  const locale = useLocale();
+  useLocale();
 
   return (
     <footer className="bg-gray-900 text-white py-12">

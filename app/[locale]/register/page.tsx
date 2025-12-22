@@ -59,14 +59,13 @@ export default function RegisterPage() {
 
       setStep("verify");
       setSuccess(t("auth.codeSent"));
-    } catch (err) {
+    } catch {
       setError(t("auth.connectionError"));
       setLoading(false);
     }
   };
 
-  const handleVerifySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitVerify = async () => {
     setLoading(true);
     setError("");
 
@@ -95,6 +94,11 @@ export default function RegisterPage() {
       setError(t("auth.connectionError"));
       setLoading(false);
     }
+  };
+
+  const handleVerifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitVerify();
   };
 
   return (
@@ -204,7 +208,8 @@ export default function RegisterPage() {
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && code.length === 6 && !loading) {
-                    handleVerifySubmit(e as any);
+                    e.preventDefault();
+                    void submitVerify();
                   }
                 }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl tracking-widest"

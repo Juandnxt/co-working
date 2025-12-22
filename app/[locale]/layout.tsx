@@ -2,7 +2,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { Poppins } from "next/font/google";
-import { locales } from '@/i18n';
+import { isLocale, locales } from '@/i18n';
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -25,7 +25,7 @@ export default async function LocaleLayout({
   const { locale } = await params;
   
   // Validate that the incoming `locale` parameter is valid
-  if (!locales.includes(locale as any)) {
+  if (!isLocale(locale)) {
     notFound();
   }
 

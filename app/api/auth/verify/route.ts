@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyCode, verifyLoginCode } from "@/lib/auth";
-import { createSession } from "@/lib/session";
+import { verifyCode } from "@/lib/auth";
 import { z } from "zod";
 
 const verifySchema = z.object({

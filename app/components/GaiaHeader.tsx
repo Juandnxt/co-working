@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -11,9 +10,8 @@ type Props = {
 
 const buildNavLinks = (basePath: string) => [
   { label: "Preços", href: `${basePath}/precos` },
-  { label: "Espaços", href: `${basePath}#espacos` },
+  { label: "Espaços", href: `${basePath}/espacos` },
   { label: "Day Pass", href: `${basePath}#day-pass` },
-  { label: "Escritório Virtual", href: `${basePath}#contacto` },
   { label: "Contacto", href: `${basePath}#contacto` },
 ];
 

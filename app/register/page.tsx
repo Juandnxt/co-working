@@ -57,14 +57,13 @@ export default function RegisterPage() {
       setStep("verify");
       setSuccess("Verification code sent to your email");
       setLoading(false); // Reset loading when moving to verify step
-    } catch (err) {
+    } catch {
       setError("Connection error");
       setLoading(false);
     }
   };
 
-  const handleVerifySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitVerify = async () => {
     if (loading || code.length !== 6) return;
     
     setLoading(true);
@@ -102,6 +101,11 @@ export default function RegisterPage() {
       setError("Connection error. Please try again.");
       setLoading(false);
     }
+  };
+
+  const handleVerifySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitVerify();
   };
 
   return (
@@ -233,7 +237,7 @@ export default function RegisterPage() {
                   onKeyDown={(e) => {
                     if (e.key === "Enter" && code.length === 6 && !loading) {
                       e.preventDefault();
-                      handleVerifySubmit(e as any);
+                      void submitVerify();
                     }
                   }}
                   autoFocus
@@ -258,7 +262,8 @@ export default function RegisterPage() {
                 }`}
                 onClick={(e) => {
                   if (code.length === 6 && !loading) {
-                    handleVerifySubmit(e as any);
+                    e.preventDefault();
+                    void submitVerify();
                   }
                 }}
               >

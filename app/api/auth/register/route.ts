@@ -41,22 +41,23 @@ export async function POST(request: NextRequest) {
       message: "Verification code sent to your email",
       userId: user.id,
     });
-  } catch (error: any) {
+  } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: "Invalid data", details: error.errors },
         { status: 400 }
       );
     }
-    console.error("Registration error:", error);
-    console.error("Error stack:", error.stack);
+    const err = error instanceof Error ? error : new Error("Error registering user");
+    console.error("Registration error:", err);
+    console.error("Error stack:", err.stack);
     
     // Return more detailed error message
-    const errorMessage = error.message || "Error registering user";
+    const errorMessage = err.message || "Error registering user";
     return NextResponse.json(
       { 
         error: errorMessage,
-        details: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        details: process.env.NODE_ENV === 'development' ? err.stack : undefined
       },
       { status: 500 }
     );

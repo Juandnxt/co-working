@@ -43,13 +43,14 @@ export async function createUser(email: string, password: string, name: string) 
     await sendVerificationCode(email, code);
 
     return user;
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as Partial<Record<"message" | "code" | "detail" | "hint", unknown>>;
     console.error('Error in createUser:', error);
     console.error('Error details:', {
-      message: error.message,
-      code: error.code,
-      detail: error.detail,
-      hint: error.hint,
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
+      hint: err.hint,
     });
     throw error;
   }
@@ -119,12 +120,13 @@ export async function verifyCode(email: string, code: string) {
     console.log('✅ Welcome email sent');
 
     return user;
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as Partial<Record<"message" | "code" | "detail", unknown>>;
     console.error('❌ Error in verifyCode:', error);
     console.error('Error details:', {
-      message: error.message,
-      code: error.code,
-      detail: error.detail,
+      message: err.message,
+      code: err.code,
+      detail: err.detail,
     });
     throw error;
   }

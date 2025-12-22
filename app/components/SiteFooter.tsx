@@ -3,6 +3,7 @@
 import { useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { locales } from "@/i18n";
+import ChatOpenLink from "./ChatOpenLink";
 
 function getBasePath(pathname: string) {
   const seg = pathname.split("/").filter(Boolean)[0];
@@ -18,7 +19,7 @@ export default function SiteFooter() {
   const basePath = useMemo(() => getBasePath(pathname), [pathname]);
 
   const links = [
-    { label: "Espaços", href: safeHref(`${basePath}/#espacos`) },
+    { label: "Espaços", href: safeHref(`${basePath}/espacos`) },
     { label: "Preços", href: safeHref(`${basePath}/#precos`) },
     { label: "Day Pass", href: safeHref(`${basePath}/#day-pass`) },
     { label: "Contacto", href: safeHref(`${basePath}/#contacto`) }
@@ -54,15 +55,13 @@ export default function SiteFooter() {
                 <IconMail />
                 hello@gaiacoworking.pt
               </a>
-              <a
-                href="https://wa.me/351000000000"
-                target="_blank"
-                rel="noreferrer"
+              <ChatOpenLink
+                href="#chat"
                 className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:shadow-md transition-shadow"
               >
                 <IconChat />
-                WhatsApp
-              </a>
+                Chat
+              </ChatOpenLink>
             </div>
           </div>
 

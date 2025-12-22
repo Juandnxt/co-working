@@ -49,15 +49,14 @@ export default function LoginPage() {
       }
 
       setStep("code");
-    } catch (err) {
+    } catch {
       setError(t("auth.connectionError"));
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCodeSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submitCode = async () => {
     setLoading(true);
     setError("");
 
@@ -88,6 +87,11 @@ export default function LoginPage() {
       setError(t("auth.connectionError"));
       setLoading(false);
     }
+  };
+
+  const handleCodeSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await submitCode();
   };
 
   return (
@@ -169,7 +173,8 @@ export default function LoginPage() {
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && code.length === 6 && !loading) {
-                    handleCodeSubmit(e as any);
+                    e.preventDefault();
+                    void submitCode();
                   }
                 }}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-2xl tracking-widest"

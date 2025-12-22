@@ -198,9 +198,9 @@ export default function PrecosPage() {
             return (
               <article
                 key={service.name}
-                className="group rounded-[28px] bg-white border border-black/5 shadow-soft overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition"
+                className="group rounded-[28px] bg-white border border-black/5 shadow-soft overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition relative flex flex-col"
               >
-                <div className="relative aspect-[16/10] bg-black/5">
+                <div className="relative aspect-[4/3] bg-black/5">
                   <img
                     src={service.imageSrc}
                     alt={service.imageAlt}
@@ -218,29 +218,35 @@ export default function PrecosPage() {
                   </div>
                 </div>
 
-                <div className="p-5">
+                <div
+                  className={`p-5 transition flex-1 flex flex-col ${
+                    isOpen ? "blur-sm opacity-60 pointer-events-none select-none" : ""
+                  }`}
+                >
                   <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 mb-3">
                     Destaques
                   </p>
-                  <ul className="space-y-2 text-sm text-black/80">
-                    {service.details.slice(0, 3).map((item) => (
-                      <li key={item} className="flex gap-2">
-                        <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
-                        <span>{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="flex-1">
+                    <ul className="space-y-2 text-sm text-black/80">
+                      {service.details.slice(0, 3).map((item) => (
+                        <li key={item} className="flex gap-2">
+                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-600" aria-hidden />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
 
-                  <div className="mt-5 flex items-center justify-between gap-3">
+                  <div className="mt-auto pt-5 flex items-center justify-between gap-3">
                     <button
                       type="button"
                       onClick={() => setOpenKey((prev) => (prev === service.name ? null : service.name))}
                       className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#F7F7F5] transition"
                       aria-expanded={isOpen}
                     >
-                      {isOpen ? "Fechar detalhes" : "Ver detalhes"}
+                      Ver detalhes
                       <svg
-                        className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+                        className="h-4 w-4 transition-transform"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -258,54 +264,126 @@ export default function PrecosPage() {
                       Reservar
                     </a>
                   </div>
+                </div>
 
-                  {isOpen && (
-                    <div className="mt-5 space-y-4 border-t border-black/5 pt-5">
-                      <div className="space-y-2">
-                        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
-                          Inclui
-                        </p>
-                        <ul className="space-y-2 text-sm text-black/80">
-                          {service.details.map((item) => (
-                            <li key={item} className="flex gap-2">
-                              <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
-                              <span>{item}</span>
-                            </li>
-                          ))}
-                        </ul>
+                {isOpen && (
+                  <div className="absolute inset-0 z-10">
+                    <button
+                      type="button"
+                      aria-label="Fechar detalhes"
+                      onClick={() => setOpenKey(null)}
+                      className="absolute inset-0 bg-white/70 backdrop-blur-md"
+                    />
+
+                    <div className="absolute inset-3 rounded-[24px] bg-white shadow-2xl shadow-black/20 border border-black/10 overflow-hidden flex flex-col">
+                      <div className="h-1 w-full bg-gradient-to-r from-blue-600 to-purple-600" />
+                      <div className="px-4 py-3 border-b border-black/5 flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
+                            Detalhes
+                          </p>
+                          <p className="text-base font-extrabold leading-tight truncate">{service.name}</p>
+                          <span className="mt-2 inline-flex items-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-3 py-1 text-[11px] font-semibold text-white shadow-soft">
+                            {service.price}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setOpenKey(null)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white hover:bg-[#F7F7F5] transition"
+                          aria-label="Fechar"
+                        >
+                          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
+                            <path strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
+                          </svg>
+                        </button>
                       </div>
 
-                      <div className="grid gap-4 sm:grid-cols-2">
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
-                            Não inclui
-                          </p>
-                          <ul className="space-y-2 text-sm text-black/80">
-                            {service.excludes.map((item) => (
+                      <div className="gc-scrollbar flex-1 min-h-0 overflow-auto px-4 py-4 space-y-4">
+                        <section className="rounded-2xl bg-[#F7F7F5] border border-black/5 p-4">
+                          <div className="flex items-center gap-2 mb-3">
+                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-soft">
+                              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
+                                <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" />
+                              </svg>
+                            </span>
+                            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50">
+                              Inclui
+                            </p>
+                          </div>
+                          <ul className="space-y-2 text-[13px] leading-relaxed text-black/80">
+                            {service.details.map((item) => (
                               <li key={item} className="flex gap-2">
-                                <span className="mt-1.5 h-2 w-2 rounded-full bg-black/25" aria-hidden />
-                                <span>{item}</span>
+                                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-600" aria-hidden />
+                                <span className="min-w-0">{item}</span>
                               </li>
                             ))}
                           </ul>
+                        </section>
+
+                        <div className="grid gap-4">
+                          <section className="rounded-2xl bg-white border border-black/5 p-4 shadow-soft">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-black/10 text-black/70">
+                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
+                                  <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
+                                </svg>
+                              </span>
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50">
+                                Não inclui
+                              </p>
+                            </div>
+                            <ul className="space-y-2 text-[13px] leading-relaxed text-black/80">
+                              {service.excludes.map((item) => (
+                                <li key={item} className="flex gap-2">
+                                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-black/25" aria-hidden />
+                                  <span className="min-w-0">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </section>
+
+                          <section className="rounded-2xl bg-white border border-black/5 p-4 shadow-soft">
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-soft">
+                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
+                                  <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
+                                </svg>
+                              </span>
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50">
+                                Condições
+                              </p>
+                            </div>
+                            <ul className="space-y-2 text-[13px] leading-relaxed text-black/80">
+                              {service.conditions.map((item) => (
+                                <li key={item} className="flex gap-2">
+                                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-600" aria-hidden />
+                                  <span className="min-w-0">{item}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </section>
                         </div>
-                        <div className="space-y-2">
-                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
-                            Condições
-                          </p>
-                          <ul className="space-y-2 text-sm text-black/80">
-                            {service.conditions.map((item) => (
-                              <li key={item} className="flex gap-2">
-                                <span className="mt-1.5 h-2 w-2 rounded-full bg-blue-600" aria-hidden />
-                                <span>{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
+                      </div>
+
+                      <div className="px-4 py-3 border-t border-black/5 bg-white flex items-center justify-between gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setOpenKey(null)}
+                          className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#F7F7F5] transition"
+                        >
+                          Fechar
+                        </button>
+                        <a
+                          href="mailto:hello@gaiacoworking.pt"
+                          className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:shadow-md transition-shadow"
+                        >
+                          Reservar
+                        </a>
                       </div>
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
               </article>
             );
           })}

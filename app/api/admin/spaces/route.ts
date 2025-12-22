@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import sql from "@/lib/db";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getSession();
     
@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     `;
 
     // Get available spaces count
-    const availableSpaces = spaces.filter((s: any) => s.available).length;
+    const availableSpaces = (spaces as Array<{ available?: boolean }>).filter((s) => s.available).length;
 
     return NextResponse.json({ spaces, availableCount: availableSpaces, totalCount: spaces.length });
   } catch (error) {
@@ -54,7 +54,7 @@ export async function PUT(request: NextRequest) {
 
     // Build update query dynamically
     const updateFields: string[] = [];
-    const updateValues: any[] = [];
+    const updateValues: Array<string | number | boolean | null> = [];
     
     if (available !== undefined) {
       updateFields.push('available');

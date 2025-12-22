@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/session";
 import sql from "@/lib/db";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getSession();
     
@@ -76,7 +76,13 @@ export async function PUT(request: NextRequest) {
       );
     }
 
-    const body = await request.json();
+    const body = (await request.json()) as {
+      id?: string;
+      openTime?: string;
+      closeTime?: string;
+      isOpen?: boolean;
+      spaceId?: string | null;
+    };
     const { id, ...updateData } = body;
 
     if (!id) {
@@ -88,7 +94,7 @@ export async function PUT(request: NextRequest) {
 
     // Build update query dynamically
     const updateFields: string[] = [];
-    const updateValues: any[] = [];
+    const updateValues: Array<string | number | boolean | null> = [];
     
     if (updateData.openTime) {
       updateFields.push('openTime');

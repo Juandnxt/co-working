@@ -45,6 +45,30 @@ body {
   transform-origin: top center;
 }
 
+/* Modern, transparent scrollbars (opt-in via .gc-scrollbar) */
+.gc-scrollbar {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: rgba(15, 15, 15, 0.22) transparent; /* thumb track */
+}
+
+.gc-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.gc-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.gc-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(15, 15, 15, 0.18);
+  border-radius: 999px;
+  border: 0;
+}
+
+.gc-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(15, 15, 15, 0.28);
+}
+
 @keyframes dropdown {
   from {
     opacity: 0;

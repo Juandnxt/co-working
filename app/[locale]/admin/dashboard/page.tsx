@@ -61,12 +61,21 @@ interface Schedule {
 }
 
 const daysOfWeek = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+type TabId = 'dashboard' | 'bookings' | 'subscriptions' | 'spaces' | 'schedule' | 'settings';
+const tabs: Array<{ id: TabId; label: string }> = [
+  { id: 'dashboard', label: 'Dashboard' },
+  { id: 'bookings', label: 'Reservas' },
+  { id: 'subscriptions', label: 'Suscripciones' },
+  { id: 'spaces', label: 'Espacios' },
+  { id: 'schedule', label: 'Horarios' },
+  { id: 'settings', label: 'Configuración' },
+];
 
 export default function AdminDashboard() {
   const router = useRouter();
   const locale = useLocale();
   const { data: session, status } = useSession();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'bookings' | 'subscriptions' | 'spaces' | 'schedule' | 'settings'>('dashboard');
+  const [activeTab, setActiveTab] = useState<TabId>('dashboard');
   const [stats, setStats] = useState<Stats | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -214,17 +223,10 @@ export default function AdminDashboard() {
         {/* Navigation Tabs */}
         <div className="bg-white rounded-lg shadow-sm mb-6">
           <nav className="flex space-x-1 p-1">
-            {[
-              { id: 'dashboard', label: 'Dashboard' },
-              { id: 'bookings', label: 'Reservas' },
-              { id: 'subscriptions', label: 'Suscripciones' },
-              { id: 'spaces', label: 'Espacios' },
-              { id: 'schedule', label: 'Horarios' },
-              { id: 'settings', label: 'Configuración' },
-            ].map((tab) => (
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id)}
                 className={`px-4 py-2 rounded-md font-medium transition-colors ${
                   activeTab === tab.id
                     ? 'bg-blue-600 text-white'

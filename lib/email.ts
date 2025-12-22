@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Verify connection on initialization
-transporter.verify((error, success) => {
+transporter.verify((error) => {
   if (error) {
     console.error('❌ Email configuration error:', error);
   } else {
@@ -54,10 +54,11 @@ export async function sendVerificationCode(email: string, code: string) {
 
     console.log('✅ Verification email sent:', info.messageId);
     return true;
-  } catch (error: any) {
-    console.error('❌ Error sending verification code:', error.message);
-    if (error.response) {
-      console.error('Error details:', error.response.body);
+  } catch (error) {
+    const err = error as { message?: string; response?: { body?: unknown } };
+    console.error('❌ Error sending verification code:', err.message ?? error);
+    if (err.response) {
+      console.error('Error details:', err.response.body);
     }
     return false;
   }
@@ -102,10 +103,11 @@ export async function sendWelcomeEmail(email: string, name: string) {
 
     console.log('✅ Welcome email sent:', info.messageId);
     return true;
-  } catch (error: any) {
-    console.error('❌ Error sending welcome email:', error.message);
-    if (error.response) {
-      console.error('Error details:', error.response.body);
+  } catch (error) {
+    const err = error as { message?: string; response?: { body?: unknown } };
+    console.error('❌ Error sending welcome email:', err.message ?? error);
+    if (err.response) {
+      console.error('Error details:', err.response.body);
     }
     return false;
   }
@@ -179,10 +181,11 @@ export async function sendBookingConfirmation(email: string, name: string, booki
 
     console.log('✅ Booking confirmation email sent:', info.messageId);
     return true;
-  } catch (error: any) {
-    console.error('❌ Error sending booking confirmation email:', error.message);
-    if (error.response) {
-      console.error('Error details:', error.response.body);
+  } catch (error) {
+    const err = error as { message?: string; response?: { body?: unknown } };
+    console.error('❌ Error sending booking confirmation email:', err.message ?? error);
+    if (err.response) {
+      console.error('Error details:', err.response.body);
     }
     return false;
   }
@@ -271,10 +274,11 @@ export async function sendBookingNotificationToOwner(bookingData: {
 
     console.log('✅ Booking notification email sent to owner:', info.messageId);
     return true;
-  } catch (error: any) {
-    console.error('❌ Error sending booking notification email:', error.message);
-    if (error.response) {
-      console.error('Error details:', error.response.body);
+  } catch (error) {
+    const err = error as { message?: string; response?: { body?: unknown } };
+    console.error('❌ Error sending booking notification email:', err.message ?? error);
+    if (err.response) {
+      console.error('Error details:', err.response.body);
     }
     return false;
   }

@@ -24,19 +24,21 @@ async function testConnection() {
       ORDER BY table_name
     `;
     
+    const typedTables = tables as unknown as Array<{ table_name: string }>;
+
     console.log('\n📊 Tables found:');
-    if (tables.length === 0) {
+    if (typedTables.length === 0) {
       console.log('❌ No tables found! You need to run database/schema.sql in Supabase SQL Editor');
       console.log('   Go to: Supabase Dashboard > SQL Editor > New Query');
       console.log('   Copy and paste the contents of database/schema.sql');
     } else {
-      tables.forEach((table: any) => {
+      for (const table of typedTables) {
         console.log(`  ✅ ${table.table_name}`);
-      });
+      }
     }
     
     // Test User table structure
-    if (tables.some((t: any) => t.table_name === 'User')) {
+    if (typedTables.some((t) => t.table_name === 'User')) {
       const userColumns = await sql`
         SELECT column_name, data_type 
         FROM information_schema.columns 
@@ -45,9 +47,10 @@ async function testConnection() {
         ORDER BY ordinal_position
       `;
       console.log('\n📋 User table columns:');
-      userColumns.forEach((col: any) => {
+      const typedUserColumns = userColumns as unknown as Array<{ column_name: string; data_type: string }>;
+      for (const col of typedUserColumns) {
         console.log(`  - ${col.column_name} (${col.data_type})`);
-      });
+      }
       
       // Try to count users
       const userCount = await sql`SELECT COUNT(*) as count FROM "User"`;
@@ -56,16 +59,17 @@ async function testConnection() {
     
     await sql.end();
     process.exit(0);
-  } catch (error: any) {
+  } catch (error) {
+    const err = error as Partial<Record<"message" | "code" | "detail" | "hint" | "stack", unknown>>;
     console.error('\n❌ Database connection failed!');
-    console.error('Error:', error.message);
+    console.error('Error:', err.message ?? error);
     console.error('Details:', {
-      code: error.code,
-      detail: error.detail,
-      hint: error.hint,
+      code: err.code,
+      detail: err.detail,
+      hint: err.hint,
     });
-    if (error.stack) {
-      console.error('\nStack trace:', error.stack);
+    if (err.stack) {
+      console.error('\nStack trace:', err.stack);
     }
     await sql.end();
     process.exit(1);
