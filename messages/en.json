@@ -20,7 +20,16 @@
     "services": "Services",
     "spaces": "Spaces",
     "book": "Book",
-    "profile": "My Profile"
+    "profile": "My Profile",
+    "prices": "Prices",
+    "contact": "Contact",
+    "dayPass": "Day Pass"
+  },
+  "nav": {
+    "prices": "Prices",
+    "spaces": "Spaces",
+    "dayPass": "Day Pass",
+    "contact": "Contact"
   },
   "auth": {
     "loginTitle": "Login",
@@ -48,73 +57,85 @@
     "fullName": "Full Name"
   },
   "hero": {
-    "title": "Your Workspace",
-    "titleHighlight": "Ideal",
-    "subtitle": "A modern and productive environment where creativity and collaboration meet. Book your desk or meeting room today.",
-    "bookNow": "Book Now",
-    "viewSpaces": "View Spaces",
-    "access24": "24/7 Access",
-    "access24Desc": "Work whenever you want, no time restrictions",
-    "wifi": "High-Speed WiFi",
-    "wifiDesc": "Fast and stable connection for all your needs",
-    "community": "Active Community",
-    "communityDesc": "Connect with professionals and entrepreneurs"
-  },
-  "services": {
-    "title": "Our Services",
-    "subtitle": "Everything you need to work productively and comfortably",
-    "dedicatedDesks": "Dedicated Desks",
-    "dedicatedDesksDesc": "Individual workspaces with all necessary amenities",
-    "meetingRooms": "Meeting Rooms",
-    "meetingRoomsDesc": "Private spaces equipped with projector and whiteboard for your presentations",
-    "cafe": "Cafeteria",
-    "cafeDesc": "Coffee and snacks available all day to keep you energized",
-    "parking": "Parking",
-    "parkingDesc": "Free parking for all our members",
-    "printing": "Printing",
-    "printingDesc": "Printing and scanning service available in the space",
-    "reception": "Reception",
-    "receptionDesc": "Reception staff to assist you and receive your packages"
+    "location": "Vila Nova de Gaia · Porto Metro",
+    "title": "Coworking in Vila Nova de Gaia",
+    "subtitle": "Minutes from Porto, with a modern environment, dedicated team and a professional community ready to welcome you.",
+    "bookTour": "Book Tour",
+    "dayPass": "Day Pass"
   },
   "spaces": {
-    "title": "Our Spaces",
-    "subtitle": "Choose the perfect space for your needs",
-    "openSpace": "Open Space",
-    "privateOffice": "Private Office",
-    "meetingRoom": "Meeting Room",
-    "eventSpace": "Event Space",
-    "capacity": "people",
-    "perDay": "/day",
-    "perHour": "/hour",
-    "book": "Book",
-    "sharedDesks": "Shared desks",
-    "unlimitedWifi": "Unlimited WiFi",
-    "coffeeIncluded": "Coffee included",
-    "closedSpace": "Closed space",
-    "fullFurniture": "Full furniture",
-    "outsideView": "Outside view",
-    "projector": "Projector",
-    "whiteboard": "Whiteboard",
-    "videoConference": "Video conference",
-    "professionalSound": "Professional sound",
-    "lighting": "Lighting",
-    "cateringAvailable": "Catering available"
+    "title": "Spaces",
+    "subtitle": "8 different spaces for every type of day",
+    "description": "Meeting room, video call room, restaurant (nearby), individual desk and shared tables — everything designed for focus and comfort."
   },
-  "booking": {
-    "title": "Book Your Space",
-    "subtitle": "Complete the form and we will contact you",
-    "spaceType": "Space Type",
-    "selectSpace": "Select a space",
-    "date": "Date",
-    "time": "Time",
-    "sendBooking": "Send Booking"
+  "facilities": {
+    "title": "Facilities",
+    "subtitle": "Facilities for a better work environment",
+    "description": "Everything you need to work without distractions, close to Porto and with the tranquility of Gaia.",
+    "wifi": "Fast Wi-Fi",
+    "meetingRoom": "Meeting room",
+    "phoneBooths": "Phone booths",
+    "kitchen": "Equipped kitchen",
+    "lockers": "Lockers",
+    "printing": "Printing",
+    "packages": "Package reception",
+    "secure": "Secure access"
   },
-  "footer": {
-    "description": "Your ideal workspace to grow and connect with other professionals.",
-    "quickLinks": "Quick Links",
-    "contact": "Contact",
-    "followUs": "Follow Us",
-    "rights": "All rights reserved"
+  "prices": {
+    "title": "Value and plans",
+    "subtitle": "The ideal coworking for those working between Gaia and Porto",
+    "description": "Choose the right plan: day pass for total mobility, fixed spots for consistent routine or dedicated offices for focused teams.",
+    "viewPrices": "View Prices",
+    "membership": "Membership Plans",
+    "membershipDesc": "Flexible options for teams and freelancers.",
+    "dedicated": "Dedicated offices",
+    "dedicatedDesc": "Privacy with access to the Gaia community.",
+    "flexible": "Flexible prices · Daily and monthly plans"
+  },
+  "location": {
+    "title": "Location",
+    "subtitle": "In Vila Nova de Gaia, connected to Porto",
+    "description": "Close to metro and quick connections to Porto. Near services, restaurants and Douro views for an inspiring break.",
+    "metro": "Metro",
+    "metroDesc": "Quickly connects to Porto",
+    "parking": "Parking",
+    "parkingDesc": "Nearby parks and streets",
+    "cafes": "Cafes",
+    "cafesDesc": "Restaurants and coffee spots",
+    "access": "Access",
+    "accessDesc": "Ponte do Infante and A1",
+    "address": "Address",
+    "addressLine1": "Gaia Coworking",
+    "addressLine2": "Vila Nova de Gaia · Porto Metropolitan Area, Portugal",
+    "addressLine3": "Near General Torres Station and metro."
+  },
+  "cta": {
+    "title": "Book a visit and discover the space",
+    "description": "Schedule a personalized tour, try a day pass and discover how our community can boost your work.",
+    "bookVisit": "Book visit"
+  },
+  "productivity": {
+    "title": "Productivity and community",
+    "subtitle": "Space to increase your productivity",
+    "description": "Bright environment, comfortable spaces, daily networking and present team to ensure your work flows smoothly."
+  },
+  "precos": {
+    "page": {
+      "label": "Prices",
+      "title": "Plans and Offers Gaia Coworking",
+      "subtitle": "Choose the perfect option for your work. From flexible spots to private offices, we have the ideal space for you in Vila Nova de Gaia."
+    },
+    "tabs": {
+      "ofertas": "Offers",
+      "escritorios": "Offices",
+      "salas": "Meeting Rooms"
+    }
+  },
+  "espacos": {
+    "page": {
+      "label": "Spaces",
+      "title": "Find the right space for your day",
+      "subtitle": "8 different spaces — from flexible spots to private offices and meeting rooms."
+    }
   }
 }
-

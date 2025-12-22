@@ -1,422 +1,457 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
-const services = [
+// Datos organizados por categorías con imágenes
+const ofertas = [
   {
-    name: "Day Pass",
-    price: "20€ / dia (+ IVA)",
-    imageSrc:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Trabalho em open space",
-    details: [
-      "Acesso a áreas comuns e open space.",
-      "Wi-Fi de alta velocidade.",
-      "Zonas lounge e cozinha com café/água.",
-      "1x uso de phone booth (mediante disponibilidade).",
-      "Suporte da equipa na receção.",
-      "Impressões básicas (fair use).",
-      "Ideal para freelancers e remote workers a minutos do Porto.",
-    ],
-    excludes: ["Sem cacifo.", "Sem sala de reuniões dedicada.", "Sem receção de correio/encomendas."],
-    conditions: [
-      "Horário: 09h-19h, dias úteis.",
-      "Lugar rotativo em zona partilhada.",
-      "Não requer caução.",
-      "Chamadas em phone booth ou zonas indicadas.",
-    ],
+    title: "Lugar Flexível - Passe Diário",
+    desc: "Um lugar disponível em qualquer mesa",
+    highlights: ["14€ + IVA", "Por dia", "Mesa partilhada", "Flexibilidade total"],
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Lugar Flexível",
+    subtipo: "Passe Diário",
+    preco: "14€ + IVA",
+    unidade: "Dia"
   },
   {
-    name: "Week Pass",
-    price: "75€ / semana (+ IVA)",
-    imageSrc:
-      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Espaço moderno de coworking",
-    details: [
-      "Lugar rotativo 5 dias seguidos em mesa partilhada.",
-      "Wi-Fi rápido e zonas lounge.",
-      "Cozinha com café/água incluídos.",
-      "Até 2x reservas de phone booth curtas/dia (sujeito a disponibilidade).",
-      "Suporte da equipa na receção.",
-      "Impressões básicas (fair use).",
-      "Perfeito para trabalhar em Gaia com ligações rápidas ao Porto.",
-    ],
-    excludes: ["Sem sala de reuniões formal.", "Sem cacifo dedicado.", "Sem receção de correio."],
-    conditions: [
-      "Horário: 09h-19h, dias úteis.",
-      "Sem caução.",
-      "Não acumulável com outras semanas.",
-      "Chamadas em zonas indicadas.",
-    ],
+    title: "Lugar Flexível - Passe Semanal",
+    desc: "Uso de qualquer lugar disponível durante 1 semana, mesa partilhada",
+    highlights: ["30€ + IVA", "Por semana", "Mesa partilhada", "5 dias úteis"],
+    image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Lugar Flexível",
+    subtipo: "Passe Semanal",
+    preco: "30€ + IVA",
+    unidade: "Semana"
   },
   {
-    name: "Half-Day Flex (Manhã/Tarde)",
-    price: "12€ / meio-dia (+ IVA)",
-    imageSrc:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Ambiente de trabalho calmo",
-    details: [
-      "Lugar rotativo em zona partilhada.",
-      "Wi-Fi rápido e zonas lounge.",
-      "Cozinha com café/água.",
-      "Suporte da equipa.",
-      "Ideal para passagens rápidas entre Gaia e Porto.",
-    ],
-    excludes: [
-      "Sem sala de reuniões.",
-      "Sem phone booth reservado.",
-      "Sem impressões.",
-      "Sem cacifo; sem correio.",
-    ],
-    conditions: [
-      "Manhã 09h-13h ou tarde 14h-19h.",
-      "Dias úteis.",
-      "Uso silencioso em open space.",
-      "Sem caução.",
-    ],
+    title: "Lugar Flexível - Pack 3 dias",
+    desc: "Uso de qualquer lugar disponível em 3 dias à escolha, mesa partilhada",
+    highlights: ["55€ + IVA", "Pack 3 dias", "À escolha", "Mesa partilhada"],
+    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Lugar Flexível",
+    subtipo: "Pack 3 dias",
+    preco: "55€ + IVA",
+    unidade: "Pack"
   },
   {
-    name: "Flex Desk (Mesa Partilhada) · Mensal",
-    price: "160€ / mês (+ IVA)",
-    imageSrc:
-      "https://images.unsplash.com/photo-1483478550801-ceba5fe50e8e?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Mesa partilhada para trabalhar",
-    details: [
-      "Acesso dias úteis 09h-19h.",
-      "Lugar rotativo em open space.",
-      "Wi-Fi rápido, lounge e cozinha com café/água.",
-      "4h/mês sala de reuniões (reserva).",
-      "5h/mês phone booth.",
-      "Impressões básicas (fair use).",
-      "Suporte da equipa.",
-    ],
-    excludes: ["Sem cacifo dedicado.", "Sem receção de correio/encomendas (opção extra).", "Sem acesso 24/7."],
-    conditions: [
-      "Permanência mínima 1 mês.",
-      "Sem caução para particulares (pode ser solicitada para empresas).",
-      "Uso responsável de reuniões/phone booth.",
-    ],
+    title: "Lugar Flexível - Pack 5 dias",
+    desc: "Uso de qualquer lugar disponível em 5 dias à escolha, mesa partilhada",
+    highlights: ["60€ + IVA", "Pack 5 dias", "À escolha", "Mesa partilhada"],
+    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Lugar Flexível",
+    subtipo: "Pack 5 dias",
+    preco: "60€ + IVA",
+    unidade: "Pack"
   },
   {
-    name: "Fixed Desk (Mesa Dedicada) · Mensal",
-    price: "220€ / mês (+ IVA)",
-    imageSrc:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Secretária dedicada com conforto",
-    details: [
-      "Posto dedicado com cadeira ergonómica.",
-      "Acesso 24/7.",
-      "Wi-Fi rápido; lounge; cozinha café/água.",
-      "Cacifo incluído.",
-      "6h/mês sala de reuniões (reserva).",
-      "8h/mês phone booth.",
-      "Impressões básicas (fair use) e receção de correio/encomendas.",
-      "Suporte da equipa.",
-    ],
-    excludes: ["Horas extra de sala de reuniões (custo adicional).", "Parking não incluído."],
-    conditions: [
-      "Permanência mínima 1 mês.",
-      "Caução de 1 mês.",
-      "Regras de silêncio e chamadas em áreas definidas.",
-    ],
+    title: "Lugar Flexível - Pack 10 dias",
+    desc: "Uso de qualquer lugar disponível em 10 dias à escolha, mesa partilhada",
+    highlights: ["110€ + IVA", "Pack 10 dias", "À escolha", "Mesa partilhada"],
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Lugar Flexível",
+    subtipo: "Pack 10 dias",
+    preco: "110€ + IVA",
+    unidade: "Pack"
   },
   {
-    name: "Escritório Virtual · Mensal",
-    price: "45€ / mês (+ IVA)",
-    imageSrc:
-      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Trabalho remoto e morada fiscal",
-    details: [
-      "Morada fiscal e comercial em Vila Nova de Gaia.",
-      "Receção de correio/encomendas e notificação por email.",
-      "2h/mês sala de reuniões em dias úteis (reserva).",
-      "Apoio da equipa na receção.",
-    ],
-    excludes: [
-      "Sem lugar de trabalho diário.",
-      "Sem acesso ao open space.",
-      "Sem phone booth ou impressões incluídas.",
-    ],
-    conditions: [
-      "Permanência mínima 1 mês.",
-      "Caução de 1 mês.",
-      "Recolha de correio em 09h-19h.",
-    ],
+    title: "Lugar Fixo - Mensal",
+    desc: "Cadeira fixa numa mesa partilhada, sempre reservada para a pessoa durante o mês",
+    highlights: ["150€ + IVA", "Por mês", "Lugar fixo", "Mesa partilhada"],
+    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Lugar Fixo",
+    subtipo: "Mensal",
+    preco: "150€ + IVA",
+    unidade: "Mês"
   },
   {
-    name: "Sala de Reuniões",
-    price: "18€ / 1h (+ IVA) · 32€ / 2h (+ IVA)",
-    imageSrc:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
-    imageAlt: "Sala de reuniões moderna",
-    details: [
-      "Sala equipada (ecrã/TV ou projeção) com Wi-Fi rápido.",
-      "Água/café incluídos.",
-      "Apoio da equipa; climatização.",
-      "Ideal para equipas locais ou clientes que vêm do Porto.",
-    ],
-    excludes: ["Sem catering (opcional).", "Sem impressão de grandes volumes."],
-    conditions: [
-      "Reserva antecipada; dias úteis 09h-19h.",
-      "Excedentes faturados por hora.",
-      "Cumprir horários e capacidade indicada.",
-    ],
+    title: "Lugar Fixo - Semanal",
+    desc: "Cadeira fixa numa mesa partilhada, sempre reservada para a pessoa durante uma semana",
+    highlights: ["50€ + IVA", "Por semana", "Lugar fixo", "Mesa partilhada"],
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Lugar Fixo",
+    subtipo: "Semanal",
+    preco: "50€ + IVA",
+    unidade: "Semana"
   },
+  {
+    title: "Mesa Fixa - Mensal",
+    desc: "Mesa reservada exclusivamente para uma pessoa durante 1 mês, acesso à impressora e espaço comum",
+    highlights: ["170€ + IVA", "Por mês", "Mesa exclusiva", "Impressora incluída"],
+    image: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Mesa Fixa",
+    subtipo: "Mensal",
+    preco: "170€ + IVA",
+    unidade: "Mês"
+  },
+  {
+    title: "Mesa Fixa - Semanal",
+    desc: "Mesa reservada exclusivamente para uma pessoa durante 1 semana, acesso à impressora e espaço comum",
+    highlights: ["70€ + IVA", "Por semana", "Mesa exclusiva", "Impressora incluída"],
+    image: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Mesa Fixa",
+    subtipo: "Semanal",
+    preco: "70€ + IVA",
+    unidade: "Semana"
+  },
+  {
+    title: "Mesa Fixa - Full-time Premium",
+    desc: "Mesa fixa com acesso 24/7, impressão incluída, cacifo/locker individual, café e água gratuitos",
+    highlights: ["180€ + IVA", "Por mês", "Acesso 24/7", "Premium completo"],
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Mesa Fixa",
+    subtipo: "Full - time premium (24/7 + impressão + lockers)",
+    preco: "180€ + IVA",
+    unidade: "Mensal"
+  },
+  {
+    title: "Part-time - Pack 2 dias",
+    desc: "Acesso 2 dias por semana (09:00–19:00), mesa flexível, café e água incluídos",
+    highlights: ["85€ + IVA", "Por dia", "2 dias/semana", "Café incluído"],
+    image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Part-time (2 dias p/semana)",
+    subtipo: "Pack 2 dias",
+    preco: "85€ + IVA",
+    unidade: "Dia"
+  },
+  {
+    title: "Part-time - Pack 10 dias",
+    desc: "Acesso a qualquer 10 dias no mês, mesa flexível, café e água incluídos; 8h mensais gratuitas na sala de reuniões",
+    highlights: ["110€ + IVA", "Mensal", "10 dias/mês", "Sala reuniões incluída"],
+    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Part-time (10 dias p/mês)",
+    subtipo: "Pack 10 dias",
+    preco: "110€ + IVA",
+    unidade: "Mensal"
+  }
 ];
 
-const notes = [
-  "Horário: dias úteis 09h-19h (24/7 apenas mesas dedicadas).",
-  "Silêncio/chamadas: phone booths para chamadas; open space silencioso; reuniões em salas dedicadas.",
-  "Cancelamentos: passes não reembolsáveis; salas podem ser remarcadas com 24h; planos mensais renovam salvo aviso de 30 dias.",
-  "Faturação: emitimos fatura com NIF; valores acrescem IVA à taxa legal em Portugal.",
-  "Reservas/adesão: email/telefone/WhatsApp; visitas e tours mediante marcação; disponibilidade limitada.",
+const escritorios = [
+  {
+    title: "Escritório Privado Pequeno 1",
+    desc: "Escritório privado para 1 pessoa, ideal para trabalhar sozinho, acesso a impressora e espaço comum",
+    highlights: ["180€ + IVA", "Por mês", "1 pessoa", "Impressora incluída"],
+    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Pequeno 1",
+    preco: "180€ + IVA",
+    unidade: "Mês",
+    capacidade: "1 pessoa"
+  },
+  {
+    title: "Escritório Privado Pequeno 2",
+    desc: "Escritório privado para 1 pessoa, ideal para trabalhar sozinho, acesso a impressora e espaço comum",
+    highlights: ["180€ + IVA", "Por mês", "1 pessoa", "Impressora incluída"],
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Pequeno 2",
+    preco: "180€ + IVA",
+    unidade: "Mês",
+    capacidade: "1 pessoa"
+  },
+  {
+    title: "Escritório Privado Médio",
+    desc: "Escritório privado para 1 pessoas, adequado para trabalhar sozinho ou receber 1 convidado, acesso a impressora e sala de reuniões",
+    highlights: ["200€ + IVA", "Por mês", "2 pessoas", "Sala reuniões"],
+    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Médio",
+    preco: "200€ + IVA",
+    unidade: "Mês",
+    capacidade: "2 pessoas"
+  },
+  {
+    title: "Escritório Privado Maior",
+    desc: "Escritório privado maior para 2–3 pessoas, para trabalhar ou receber convidados, acesso a impressora, sala de reuniões e espaço comum",
+    highlights: ["230€ + IVA", "Por mês", "2-3 pessoas", "Espaço completo"],
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Maior",
+    preco: "230€ + IVA",
+    unidade: "Mês",
+    capacidade: "2-3 pessoas"
+  },
+  {
+    title: "Escritório Privado Pequeno (Hora)",
+    desc: "Escritório privado para realizar reunião online, trabalhar sozinho",
+    highlights: ["10€ + IVA", "Por hora", "1 pessoa", "Ideal para calls"],
+    image: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Pequeno",
+    preco: "10€ + IVA",
+    unidade: "Hora",
+    capacidade: "1 pessoa"
+  },
+  {
+    title: "Escritório Privado Pequeno (Dia)",
+    desc: "Escritório privado para realizar reunião online, trabalhar sozinho",
+    highlights: ["35€ + IVA", "Por dia", "1 pessoa", "Ideal para calls"],
+    image: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Pequeno",
+    preco: "35€ + IVA",
+    unidade: "Dia",
+    capacidade: "1 pessoa"
+  },
+  {
+    title: "Escritório Privado Médio (Hora)",
+    desc: "Escritório privado para 1–2 pessoas, reservado por dia, ideal para trabalhar ou receber alguém",
+    highlights: ["12€ + IVA", "Por hora", "1-2 pessoas", "Flexível"],
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Médio",
+    preco: "12€ + IVA",
+    unidade: "Hora",
+    capacidade: "1-2 pessoas"
+  },
+  {
+    title: "Escritório Privado Médio (Dia)",
+    desc: "Escritório privado para 1–2 pessoas, reservado por dia, ideal para trabalhar ou receber alguém",
+    highlights: ["55€ + IVA", "Por dia", "1-2 pessoas", "Flexível"],
+    image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Médio",
+    preco: "55€ + IVA",
+    unidade: "Dia",
+    capacidade: "1-2 pessoas"
+  },
+  {
+    title: "Escritório Privado Grande (Hora)",
+    desc: "Escritório privado para 2–3 pessoas, reservado por dia, acesso a sala de reuniões e impressora",
+    highlights: ["15€ + IVA", "Por hora", "2-3 pessoas", "Sala reuniões"],
+    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Grande",
+    preco: "15€ + IVA",
+    unidade: "Hora",
+    capacidade: "2-3 pessoas"
+  },
+  {
+    title: "Escritório Privado Grande (Dia)",
+    desc: "Escritório privado para 2–3 pessoas, reservado por dia, acesso a sala de reuniões e impressora",
+    highlights: ["65€ + IVA", "Por dia", "2-3 pessoas", "Sala reuniões"],
+    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Escritório Privado",
+    subtipo: "Grande",
+    preco: "65€ + IVA",
+    unidade: "Dia",
+    capacidade: "2-3 pessoas"
+  }
 ];
+
+const salasReuniones = [
+  {
+    title: "Sala de Reuniões Grande",
+    desc: "Sala grande para reuniões de equipa, apresentações ou workshops; equipada com monitor/projetor e mesa grande",
+    highlights: ["20€ + IVA", "Por hora", "Até 8 pessoas", "Monitor/projetor"],
+    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Grande",
+    subtipo: "Hora",
+    preco: "20€ + IVA",
+    pessoas: "até 8 pessoas"
+  },
+  {
+    title: "Sala de Reuniões Grande - Meio-dia",
+    desc: "Reserva para manhã (9–13h) ou tarde (14–18h)",
+    highlights: ["65€ + IVA", "Meio-dia", "Até 8 pessoas", "Manhã ou tarde"],
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Grande",
+    subtipo: "Meio-dia",
+    preco: "65€ + IVA",
+    pessoas: "até 8 pessoas"
+  },
+  {
+    title: "Sala de Reuniões Grande - Dia",
+    desc: "Reserva da sala durante o dia inteiro, ideal para eventos, formações ou reuniões longas",
+    highlights: ["110€ + IVA", "Por dia", "Até 8 pessoas", "Dia completo"],
+    image: "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Grande",
+    subtipo: "Dia",
+    preco: "110€ + IVA",
+    pessoas: "até 8 pessoas"
+  },
+  {
+    title: "Sala de Reuniões Pequena 1",
+    desc: "Sala pequena ideal para chamadas, entrevistas ou reuniões rápidas",
+    highlights: ["12€ + IVA", "Por hora", "1-2 pessoas", "Ideal para calls"],
+    image: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Pequena 1",
+    subtipo: "Hora",
+    preco: "12€ + IVA",
+    pessoas: "1 - 2 pessoas"
+  },
+  {
+    title: "Sala de Reuniões Pequena 1 - Meio-dia",
+    desc: "Reserva da manhã ou tarde",
+    highlights: ["35€ + IVA", "Meio-dia", "1-2 pessoas", "Manhã ou tarde"],
+    image: "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Pequena 1",
+    subtipo: "Meio-dia",
+    preco: "35€ + IVA",
+    pessoas: "1 - 2 pessoas"
+  },
+  {
+    title: "Sala de Reuniões Pequena 1 - Dia",
+    desc: "Uso exclusivo o dia todo",
+    highlights: ["60€ + IVA", "Por dia", "1-2 pessoas", "Dia completo"],
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Pequena 1",
+    subtipo: "Dia",
+    preco: "60€ + IVA",
+    pessoas: "1 - 2 pessoas"
+  },
+  {
+    title: "Sala de Reuniões Pequena 2",
+    desc: "Sala pequena ideal para chamadas, entrevistas ou reuniões rápidas",
+    highlights: ["12€ + IVA", "Por hora", "1-2 pessoas", "Ideal para calls"],
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Pequena 2",
+    subtipo: "Hora",
+    preco: "12€ + IVA",
+    pessoas: "1 - 2 pessoas"
+  },
+  {
+    title: "Sala de Reuniões Pequena 2 - Meio-dia",
+    desc: "Reserva da manhã ou tarde",
+    highlights: ["35€ + IVA", "Meio-dia", "1-2 pessoas", "Manhã ou tarde"],
+    image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    tipo: "Sala de Reuniões Pequena 2",
+    subtipo: "Meio-dia",
+    preco: "35€ + IVA",
+    pessoas: "1 - 2 pessoas"
+  }
+];
+
+type Category = "ofertas" | "escritorios" | "salas";
 
 export default function PrecosPage() {
-  const [openKey, setOpenKey] = useState<string | null>(null);
+  const [activeCategory, setActiveCategory] = useState<Category>("ofertas");
 
-  const items = useMemo(() => services, []);
+  const getCurrentItems = () => {
+    switch (activeCategory) {
+      case "ofertas":
+        return ofertas;
+      case "escritorios":
+        return escritorios;
+      case "salas":
+        return salasReuniones;
+      default:
+        return ofertas;
+    }
+  };
 
   return (
     <div className="bg-[#F7F7F5] min-h-screen text-[#1A1A1A]">
       <section className="container mx-auto px-5 py-12 lg:py-16">
         <div className="max-w-3xl">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 mb-3">Preços</p>
-          <h1 className="text-3xl lg:text-4xl font-extrabold leading-tight mb-4">Planos Gaia Coworking</h1>
+          <h1 className="text-3xl lg:text-4xl font-extrabold leading-tight mb-4">
+            Planos e Ofertas Gaia Coworking
+          </h1>
           <p className="text-lg text-black/70">
-            A minutos do Porto, com opções pensadas para freelancers, equipas pequenas e remote workers
-            que querem flexibilidade e um espaço moderno em Vila Nova de Gaia.
+            Escolhe a opção perfeita para o teu trabalho. Desde lugares flexíveis até escritórios privados, 
+            temos o espaço ideal para ti em Vila Nova de Gaia.
           </p>
         </div>
       </section>
 
-      <section className="container mx-auto px-5 pb-12 lg:pb-16 space-y-6">
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {items.map((service) => {
-            const isOpen = openKey === service.name;
-            return (
-              <article
-                key={service.name}
-                className="group rounded-[28px] bg-white border border-black/5 shadow-soft overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition relative flex flex-col"
-              >
-                <div className="relative aspect-[4/3] bg-black/5">
-                  <img
-                    src={service.imageSrc}
-                    alt={service.imageAlt}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/0 to-black/0" />
-                  <div className="absolute left-4 bottom-4 right-4 flex items-end justify-between gap-3">
-                    <h2 className="text-lg font-extrabold text-white leading-tight drop-shadow">
-                      {service.name}
-                    </h2>
-                    <span className="shrink-0 inline-flex items-center rounded-full bg-white/90 px-3 py-1.5 text-xs font-semibold text-[#1A1A1A] shadow-soft">
-                      {service.price}
-                    </span>
-                  </div>
-                </div>
-
-                <div
-                  className={`p-5 transition flex-1 flex flex-col ${
-                    isOpen ? "blur-sm opacity-60 pointer-events-none select-none" : ""
-                  }`}
-                >
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 mb-3">
-                    Destaques
-                  </p>
-                  <div className="flex-1">
-                    <ul className="space-y-2 text-sm text-black/80">
-                      {service.details.slice(0, 3).map((item) => (
-                        <li key={item} className="flex gap-2">
-                          <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-600" aria-hidden />
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div className="mt-auto pt-5 flex items-center justify-between gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setOpenKey((prev) => (prev === service.name ? null : service.name))}
-                      className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#F7F7F5] transition"
-                      aria-expanded={isOpen}
-                    >
-                      Ver detalhes
-                      <svg
-                        className="h-4 w-4 transition-transform"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        aria-hidden
-                      >
-                        <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
-                      </svg>
-                    </button>
-
-                    <a
-                      href="mailto:hello@gaiacoworking.pt"
-                      className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:shadow-md transition-shadow"
-                    >
-                      Reservar
-                    </a>
-                  </div>
-                </div>
-
-                {isOpen && (
-                  <div className="absolute inset-0 z-10">
-                    <button
-                      type="button"
-                      aria-label="Fechar detalhes"
-                      onClick={() => setOpenKey(null)}
-                      className="absolute inset-0 bg-white/70 backdrop-blur-md"
-                    />
-
-                    <div className="absolute inset-3 rounded-[24px] bg-white shadow-2xl shadow-black/20 border border-black/10 overflow-hidden flex flex-col">
-                      <div className="h-1 w-full bg-gradient-to-r from-blue-600 to-purple-600" />
-                      <div className="px-4 py-3 border-b border-black/5 flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
-                            Detalhes
-                          </p>
-                          <p className="text-base font-extrabold leading-tight truncate">{service.name}</p>
-                          <span className="mt-2 inline-flex items-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-3 py-1 text-[11px] font-semibold text-white shadow-soft">
-                            {service.price}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setOpenKey(null)}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white hover:bg-[#F7F7F5] transition"
-                          aria-label="Fechar"
-                        >
-                          <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
-                            <path strokeWidth="2" strokeLinecap="round" d="M6 6l12 12M18 6L6 18" />
-                          </svg>
-                        </button>
-                      </div>
-
-                      <div className="gc-scrollbar flex-1 min-h-0 overflow-auto px-4 py-4 space-y-4">
-                        <section className="rounded-2xl bg-[#F7F7F5] border border-black/5 p-4">
-                          <div className="flex items-center gap-2 mb-3">
-                            <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-soft">
-                              <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
-                                <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" />
-                              </svg>
-                            </span>
-                            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50">
-                              Inclui
-                            </p>
-                          </div>
-                          <ul className="space-y-2 text-[13px] leading-relaxed text-black/80">
-                            {service.details.map((item) => (
-                              <li key={item} className="flex gap-2">
-                                <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-600" aria-hidden />
-                                <span className="min-w-0">{item}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </section>
-
-                        <div className="grid gap-4">
-                          <section className="rounded-2xl bg-white border border-black/5 p-4 shadow-soft">
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-black/10 text-black/70">
-                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
-                                  <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M18 6L6 18" />
-                                </svg>
-                              </span>
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50">
-                                Não inclui
-                              </p>
-                            </div>
-                            <ul className="space-y-2 text-[13px] leading-relaxed text-black/80">
-                              {service.excludes.map((item) => (
-                                <li key={item} className="flex gap-2">
-                                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-black/25" aria-hidden />
-                                  <span className="min-w-0">{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </section>
-
-                          <section className="rounded-2xl bg-white border border-black/5 p-4 shadow-soft">
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-soft">
-                                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
-                                  <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M12 6v6l4 2" />
-                                </svg>
-                              </span>
-                              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-black/50">
-                                Condições
-                              </p>
-                            </div>
-                            <ul className="space-y-2 text-[13px] leading-relaxed text-black/80">
-                              {service.conditions.map((item) => (
-                                <li key={item} className="flex gap-2">
-                                  <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-600" aria-hidden />
-                                  <span className="min-w-0">{item}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </section>
-                        </div>
-                      </div>
-
-                      <div className="px-4 py-3 border-t border-black/5 bg-white flex items-center justify-between gap-3">
-                        <button
-                          type="button"
-                          onClick={() => setOpenKey(null)}
-                          className="inline-flex items-center justify-center rounded-full border border-black/10 bg-white px-4 py-2 text-sm font-semibold text-[#1A1A1A] hover:bg-[#F7F7F5] transition"
-                        >
-                          Fechar
-                        </button>
-                        <a
-                          href="mailto:hello@gaiacoworking.pt"
-                          className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 text-sm font-semibold text-white shadow-soft hover:shadow-md transition-shadow"
-                        >
-                          Reservar
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </article>
-            );
-          })}
+      {/* Categorías Tabs */}
+      <section className="container mx-auto px-5 mb-8">
+        <div className="flex flex-wrap gap-3">
+          <button
+            onClick={() => setActiveCategory("ofertas")}
+            className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
+              activeCategory === "ofertas"
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                : "bg-white text-black/70 hover:bg-gray-50 border border-black/10"
+            }`}
+          >
+            🪑 Ofertas
+          </button>
+          <button
+            onClick={() => setActiveCategory("escritorios")}
+            className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
+              activeCategory === "escritorios"
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                : "bg-white text-black/70 hover:bg-gray-50 border border-black/10"
+            }`}
+          >
+            🚪 Escritórios
+          </button>
+          <button
+            onClick={() => setActiveCategory("salas")}
+            className={`px-6 py-3 rounded-full font-semibold text-sm transition-all ${
+              activeCategory === "salas"
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                : "bg-white text-black/70 hover:bg-gray-50 border border-black/10"
+            }`}
+          >
+            👥 Salas de Reuniões
+          </button>
         </div>
       </section>
 
+      {/* Content - Mismo estilo que espaços */}
+      <section className="container mx-auto px-5 pb-12 lg:pb-16">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          {getCurrentItems().map((item) => (
+            <article
+              key={item.title}
+              className="group overflow-hidden rounded-[28px] bg-white border border-black/5 shadow-soft hover:shadow-lg hover:-translate-y-0.5 transition"
+            >
+              <div className="relative aspect-[16/10] bg-black/5">
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/0 to-black/0" />
+                <div className="absolute left-4 bottom-4 right-4">
+                  <p className="text-white text-base font-extrabold leading-tight drop-shadow">
+                    {item.title}
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-5 space-y-4">
+                <p className="text-sm text-black/70 leading-relaxed">{item.desc}</p>
+                <ul className="space-y-2 text-sm text-black/80">
+                  {item.highlights.map((h) => (
+                    <li key={h} className="flex gap-2">
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-blue-600" aria-hidden />
+                      <span>{h}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* CTA Section */}
       <section className="container mx-auto px-5 pb-16">
-        <div className="rounded-[28px] bg-white border border-black/5 shadow-soft overflow-hidden">
-          <div className="px-6 py-5 lg:px-8 lg:py-6 border-b border-black/5">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50">
-              Notas gerais
-            </p>
-            <p className="mt-2 text-base font-semibold text-black/80">
-              Detalhes importantes sobre horários, silêncio e faturação.
-            </p>
-          </div>
-          <div className="px-6 py-6 lg:px-8 lg:py-7">
-            <ul className="grid gap-3 md:grid-cols-2 text-sm text-black/80">
-              {notes.map((item) => (
-                <li key={item} className="flex gap-3 rounded-2xl bg-[#F7F7F5] p-4 border border-black/5">
-                  <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-soft shrink-0">
-                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
-                      <path strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" d="M5 12l5 5L20 7" />
-                    </svg>
-                  </span>
-                  <span className="leading-relaxed">{item}</span>
-                </li>
-              ))}
-            </ul>
+        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-3xl p-8 lg:p-12 text-white text-center">
+          <h2 className="text-2xl lg:text-3xl font-extrabold mb-4">
+            Tens dúvidas sobre qual plano escolher?
+          </h2>
+          <p className="text-lg mb-6 opacity-90">
+            Fala connosco através do chat e ajudamos-te a encontrar a solução perfeita.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <button
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent("gc:chat", { detail: { open: true } }));
+              }}
+              className="px-6 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-50 transition-colors"
+            >
+              Abrir Chat
+            </button>
           </div>
         </div>
       </section>
     </div>
   );
 }
-

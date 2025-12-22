@@ -4,6 +4,7 @@ import "./globals.css";
 import { Providers } from "./providers";
 import GaiaHeader from "./components/GaiaHeader";
 import SiteFooter from "./components/SiteFooter";
+import ChatWidget from "./components/ChatWidget";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -38,6 +39,7 @@ export default function RootLayout({
             <GaiaHeader />
             <main className="flex-1">{children}</main>
             <SiteFooter />
+            <ChatWidget />
           </div>
         </Providers>
       </body>
