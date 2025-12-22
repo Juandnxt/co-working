@@ -245,7 +245,7 @@ export default function Home() {
             <div className="relative">
               <div className="rounded-[28px] overflow-hidden shadow-soft">
                 <img
-                  src="https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1400&q=80"
+                  src="https://images.unsplash.com/photo-1556761175-5973dc0f32e7?auto=format&fit=crop&w=1400&q=80"
                   alt="Lounge Gaia Coworking"
                   className="h-full w-full object-cover"
                 />
