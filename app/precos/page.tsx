@@ -146,7 +146,7 @@ function ProductCard({ product }: { product: typeof products[0] }) {
           {/* Close button */}
           <button
             onClick={() => setShowOptions(false)}
-            className="mt-3 w-full flex items-center justify-center gap-1 p-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-colors cursor-pointer"
+            className="mt-3 w-full flex items-center justify-center gap-1 p-2.5 rounded-lg bg-white/10 text-white/80 text-sm font-medium hover:bg-white/20 transition-colors cursor-pointer"
           >
             <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M18 15l-6-6-6 6" strokeLinecap="round" strokeLinejoin="round" />

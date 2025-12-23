@@ -175,7 +175,7 @@ export default async function Home({ params }: Props) {
 
   return (
     <div className="bg-[#F7F7F5] text-[#1A1A1A] min-h-screen">
-      <main className="relative overflow-hidden">
+      <main className="">
         <div className="pointer-events-none absolute inset-0 opacity-40">
           <div className="blur-blob bg-blue-600/20 left-[-10%] top-[-10%]" />
           <div className="blur-blob bg-purple-600/15 right-[-12%] top-[20%]" />
