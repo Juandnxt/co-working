@@ -3,17 +3,37 @@
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { locales } from "@/i18n";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 type Props = {
   basePath?: string;
 };
 
-const buildNavLinks = (basePath: string) => [
-  { label: "Preços", href: `${basePath}/precos` },
-  { label: "Espaços", href: `${basePath}/espacos` },
-  { label: "Day Pass", href: `${basePath}#day-pass` },
-  { label: "Contacto", href: `${basePath}#contacto` },
-];
+const buildNavLinks = (basePath: string, locale: string = "pt") => {
+  const labels = {
+    pt: {
+      prices: "Preços",
+      spaces: "Espaços",
+      dayPass: "Day Pass",
+      contact: "Contacto"
+    },
+    en: {
+      prices: "Prices",
+      spaces: "Spaces",
+      dayPass: "Day Pass",
+      contact: "Contact"
+    }
+  };
+  
+  const t = labels[locale as keyof typeof labels] || labels.pt;
+  
+  return [
+    { label: t.prices, href: `${basePath}/precos` },
+    { label: t.spaces, href: `${basePath}/espacos` },
+    { label: t.dayPass, href: `${basePath}#day-pass` },
+    { label: t.contact, href: `${basePath}#contacto` },
+  ];
+};
 
 export default function GaiaHeader({ basePath = "" }: Props) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,8 +43,13 @@ export default function GaiaHeader({ basePath = "" }: Props) {
     const seg = pathname.split("/").filter(Boolean)[0];
     return seg && (locales as readonly string[]).includes(seg) ? `/${seg}` : "";
   })();
+  
+  const currentLocale = (() => {
+    const seg = pathname.split("/").filter(Boolean)[0];
+    return seg && (locales as readonly string[]).includes(seg) ? seg : "pt";
+  })();
 
-  const navLinks = buildNavLinks(autoBasePath);
+  const navLinks = buildNavLinks(autoBasePath, currentLocale);
 
   useEffect(() => {
     const onResize = () => {
@@ -57,10 +82,8 @@ export default function GaiaHeader({ basePath = "" }: Props) {
         </nav>
 
         <div className="flex items-center gap-3">
-          <div className="hidden lg:flex items-center gap-2 text-xs font-semibold rounded-full border border-black/10 px-3 py-1.5 bg-white shadow-soft">
-            <span className="px-1 text-blue-600">PT</span>
-            <span className="text-black/30">|</span>
-            <span className="px-1 text-black/60">EN</span>
+          <div className="hidden lg:flex">
+            <LanguageSwitcher />
           </div>
           <a
             href={`${autoBasePath}/login`.replace("//", "/")}
@@ -88,10 +111,8 @@ export default function GaiaHeader({ basePath = "" }: Props) {
       {menuOpen && (
         <div className="lg:hidden border-t border-black/5 bg-white/95 backdrop-blur-sm shadow-soft animate-dropdown">
           <div className="container mx-auto px-5 py-4 space-y-4">
-            <div className="flex items-center gap-3 text-xs font-semibold rounded-full border border-black/10 px-3 py-1.5 bg-white shadow-soft w-fit">
-              <span className="px-1 text-blue-600">PT</span>
-              <span className="text-black/30">|</span>
-              <span className="px-1 text-black/60">EN</span>
+            <div className="w-fit">
+              <LanguageSwitcher />
             </div>
             <div className="grid gap-2">
               {navLinks.map((item) => (

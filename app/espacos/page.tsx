@@ -2,60 +2,52 @@
 
 const spaces = [
   {
-    title: "Open Space (mesas partilhadas)",
-    desc: "Ambiente luminoso para foco e comunidade — chega, senta-te e começa a trabalhar.",
-    highlights: ["Wi‑Fi rápido", "Lounge + cozinha", "Acesso diário flexível"],
-    image:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
+    title: "Lugar Flexível (Open Space)",
+    desc: "Ambiente luminoso para foco e comunidade — escolhe uma mesa disponível e começa a trabalhar.",
+    highlights: ["Wi‑Fi rápido", "Mesa partilhada", "Acesso diário flexível", "Desde 14€ + IVA"],
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Secretária individual (mesa dedicada)",
+    title: "Lugar Fixo (Mesa Dedicada)",
     desc: "O teu lugar fixo com mais privacidade e conforto para rotina e produtividade.",
-    highlights: ["Posto fixo", "Mais privacidade", "Acesso 24/7 (planos)"],
-    image:
-      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
+    highlights: ["Posto fixo", "Mais privacidade", "Acesso 24/7 (planos)", "Desde 150€ + IVA/mês"],
+    image: "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Mesas partilhadas (hot desks)",
-    desc: "Flexibilidade total: escolhe uma mesa disponível e muda quando quiseres.",
-    highlights: ["Sem fidelização", "Ideal para day pass", "Networking natural"],
-    image:
-      "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
+    title: "Mesa Fixa (Exclusiva)",
+    desc: "Mesa reservada exclusivamente para ti, com acesso à impressora e espaço comum.",
+    highlights: ["Mesa exclusiva", "Impressora incluída", "Espaço comum", "Desde 170€ + IVA/mês"],
+    image: "https://images.unsplash.com/photo-1497366754035-f200968a6e72?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Sala de Reuniões",
+    title: "Escritório Privado",
+    desc: "Para equipas, clientes e decisões importantes — privacidade total para trabalhar ou receber.",
+    highlights: ["Privacidade total", "1-3 pessoas", "Sala reuniões", "Desde 180€ + IVA/mês"],
+    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    title: "Sala de Reuniões Grande",
     desc: "Para equipas, clientes e decisões importantes — reserva por hora e entra.",
-    highlights: ["Ecrã/TV", "Boa acústica", "Café/água"],
-    image:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+    highlights: ["Até 8 pessoas", "Monitor/projetor", "Boa acústica", "20€ + IVA/hora"],
+    image: "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Sala de videochamada (phone booth)",
+    title: "Sala de Reuniões Pequena",
     desc: "Chamadas sem ruído e sem interrupções, com privacidade e boa iluminação.",
-    highlights: ["Privacidade", "Reservável", "Perfeita para calls"],
-    image:
-      "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?auto=format&fit=crop&w=1600&q=80",
+    highlights: ["1-2 pessoas", "Privacidade", "Reservável", "12€ + IVA/hora"],
+    image: "https://images.unsplash.com/photo-1587614382346-4ec70e388b28?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Restaurante (perto) + almoço fácil",
-    desc: "Opções de almoço a poucos minutos — ideal para recarregar energias.",
-    highlights: ["Restaurantes próximos", "Cafés", "Takeaway"],
-    image:
-      "https://images.unsplash.com/photo-1529692236671-f1f6cf9683ba?auto=format&fit=crop&w=1600&q=80",
-  },
-  {
-    title: "Cozinha / coffee point",
+    title: "Cozinha / Coffee Point",
     desc: "Café, água e micro‑momentos que ajudam o teu dia a fluir.",
-    highlights: ["Café/água", "Frigorífico", "Refeições rápidas"],
-    image:
-      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80",
+    highlights: ["Café/água", "Frigorífico", "Refeições rápidas", "Incluído em planos"],
+    image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Zona lounge",
+    title: "Zona Lounge",
     desc: "Pausas confortáveis e networking — ótimo para conversas rápidas e descanso.",
-    highlights: ["Sofás confortáveis", "Zona social", "Ambiente calmo"],
-    image:
-      "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
+    highlights: ["Sofás confortáveis", "Zona social", "Ambiente calmo", "Acesso livre"],
+    image: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1600&q=80",
   },
 ];
 
@@ -71,7 +63,7 @@ export default function EspacosPage() {
             Encontra o espaço certo para o teu dia
           </h1>
           <p className="text-lg text-black/70">
-            8 ambientes diferentes — desde mesas partilhadas a salas para reuniões e videochamadas.
+            8 espaços diferentes — desde lugares flexíveis a escritórios privados e salas de reuniões.
           </p>
         </div>
       </section>
@@ -116,5 +108,3 @@ export default function EspacosPage() {
     </div>
   );
 }
-
-

@@ -13,16 +13,11 @@ function getSql() {
 
   if (!connectionString) {
     // Only throw error at runtime, not during build
-    // Check if we're in a build phase
-    const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build' || 
-                        process.env.NEXT_PHASE === 'phase-development-build';
-    
-    if (isBuildPhase) {
-      // Return a mock instance during build that will throw when used
-      return null as any;
+    if (typeof window === 'undefined' && process.env.NEXT_PHASE !== 'phase-production-build') {
+      throw new Error('SUPABASE_URL environment variable is not set');
     }
-    
-    throw new Error('SUPABASE_URL environment variable is not set');
+    // Return a mock instance during build
+    return null as any;
   }
 
   // Log connection info in development (without password)
@@ -91,4 +86,3 @@ export function generateId(): string {
     return v.toString(16);
   });
 }
-
