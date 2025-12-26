@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type ChatItem =
   | { id: string; role: "bot" | "user"; kind: "text"; text: string }
   | { id: string; role: "bot"; kind: "daypass_picker" }
   | { id: string; role: "bot"; kind: "date_picker" }
+  | { id: string; role: "bot"; kind: "calendar_picker" }
   | { id: string; role: "bot"; kind: "email_input" }
   | { id: string; role: "bot"; kind: "name_input" }
   | { id: string; role: "bot"; kind: "confirm_reservation" }
-  | { id: string; role: "bot"; kind: "payment_link"; href: string; text: string }
-  | { id: string; role: "bot"; kind: "whatsapp_cta"; href: string; label?: string };
+  | { id: string; role: "bot"; kind: "payment_link"; href: string; text: string };
 
 type ChatFlow = null | "daypass" | "reservation";
 
@@ -49,6 +49,17 @@ function extractPaymentLink(text: string): string | null {
   return null;
 }
 
+// Limpiar markdown del texto (quitar *, #, etc)
+function cleanMarkdown(text: string): string {
+  return text
+    .replace(/\*\*([^*]+)\*\*/g, '$1')  // **bold** → bold
+    .replace(/\*([^*]+)\*/g, '$1')       // *italic* → italic
+    .replace(/#{1,6}\s*/g, '')           // # headers → remove
+    .replace(/`([^`]+)`/g, '$1')         // `code` → code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // [link](url) → link
+    .trim();
+}
+
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
@@ -59,6 +70,9 @@ export default function ChatWidget() {
   const [reservationStep, setReservationStep] = useState<"date" | "email" | "name" | "confirm" | null>(null);
   const [tempEmail, setTempEmail] = useState("");
   const [tempName, setTempName] = useState("");
+  // Estado del calendario
+  const [calendarMonth, setCalendarMonth] = useState(() => new Date().getMonth());
+  const [calendarYear, setCalendarYear] = useState(() => new Date().getFullYear());
   const [messages, setMessages] = useState<ChatItem[]>([
     {
       id: uid(),
@@ -69,24 +83,27 @@ export default function ChatWidget() {
   ]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const whatsappHref = useMemo(() => "https://wa.me/351000000000", []);
   const panelRef = useRef<HTMLDivElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const toggleBtnRef = useRef<HTMLButtonElement | null>(null);
   const pendingMessageRef = useRef<string | null>(null);
   const pendingBookingRef = useRef<ReservationData | null>(null);
 
-  // Close on escape/click outside
+  // Close on escape/click outside (but not on toggle button)
   useEffect(() => {
     if (!open) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
     const onMouseDown = (e: MouseEvent) => {
-      const el = panelRef.current;
-      if (!el) return;
-      if (!el.contains(e.target as Node)) {
-        setOpen(false);
-      }
+      const panel = panelRef.current;
+      const toggleBtn = toggleBtnRef.current;
+      const target = e.target as Node;
+      
+      // Don't close if clicking on panel or toggle button
+      if (panel?.contains(target) || toggleBtn?.contains(target)) return;
+      
+      setOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
     window.addEventListener("mousedown", onMouseDown);
@@ -183,9 +200,9 @@ export default function ChatWidget() {
           id: uid(), 
           role: "bot", 
           kind: "text", 
-          text: `Excelente escolha! 🎉\n\n📦 **${booking.producto}**\n📋 **${booking.subtipo}**\n💰 **${booking.precio}**\n\nVamos fazer a tua reserva. Primeiro, escolhe a data:` 
+          text: `Excelente escolha! 🎉\n\n📦 ${booking.producto}\n📋 ${booking.subtipo}\n💰 ${booking.precio}\n\nEscolhe a data:` 
         },
-        { id: uid(), role: "bot", kind: "date_picker" }
+        { id: uid(), role: "bot", kind: "calendar_picker" }
       ]);
     } else if (open && pendingMessageRef.current) {
       const messageToSend = pendingMessageRef.current;
@@ -435,7 +452,7 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
           id: uid(), 
           role: "bot", 
           kind: "text", 
-          text: `Desculpe, ocorreu um erro: ${errorText}\n\nPor favor, tenta novamente ou contacta-nos via WhatsApp. 😔` 
+          text: `Desculpe, ocorreu um erro: ${errorText}\n\nPor favor, tenta novamente. 😔` 
         }
       ]);
     } finally {
@@ -490,16 +507,24 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
     if (!dayPassDate) return;
     const date = new Date(`${dayPassDate}T00:00:00`);
     const pretty = date.toLocaleDateString("pt-PT", { weekday: "long", year: "numeric", month: "long", day: "numeric" });
-    const text = `Olá! Gostaria de reservar um Day Pass para ${pretty}.`;
-    const wa = `${whatsappHref}?text=${encodeURIComponent(text)}`;
 
+    // Iniciar flujo de reserva con Day Pass
+    setReservationData({
+      producto: "Mesas partilhadas",
+      subtipo: "Passe Diário",
+      precio: "14€",
+      precioCentavos: 1400,
+      fecha: dayPassDate,
+    });
+    setReservationStep("email");
+    
     setMessages((prev) => [
       ...prev,
       { id: uid(), role: "user", kind: "text", text: `Day Pass: ${pretty}` },
-      { id: uid(), role: "bot", kind: "text", text: "Perfeito! Para confirmarmos disponibilidade, envia-nos esta data no WhatsApp:" },
-      { id: uid(), role: "bot", kind: "whatsapp_cta", href: wa, label: "Enviar no WhatsApp" }
+      { id: uid(), role: "bot", kind: "text", text: `Data selecionada: ${pretty} ✅\n\nAgora preciso do teu email:` },
+      { id: uid(), role: "bot", kind: "email_input" }
     ]);
-    setFlow(null);
+    setFlow("reservation");
     setDayPassDate("");
   };
 
@@ -510,7 +535,7 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
       {open && (
         <div
           ref={panelRef}
@@ -522,15 +547,15 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
           <div className="relative bg-[#0F0F0F] text-white">
             <div className="absolute inset-0 bg-gradient-to-r from-blue-600/35 to-purple-600/35" />
             <div className="relative flex items-start justify-between gap-3 px-4 py-3">
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">Assistente</p>
                 <p className="text-base font-bold leading-tight">Gaia Coworking</p>
-                <p className="text-xs text-white/70 mt-1">Resposta rápida · WhatsApp disponível</p>
+                <p className="text-xs text-white/70 mt-1">Resposta rápida</p>
               </div>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/15 transition-colors"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/10 hover:bg-white/15 transition-colors shrink-0"
                 aria-label="Fechar chat"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor">
@@ -553,7 +578,7 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
                 if (m.kind === "text") {
                   return (
                     <div key={m.id} className={wrapperClass}>
-                      <div className={bubbleClass} style={{ whiteSpace: "pre-wrap" }}>{m.text}</div>
+                      <div className={bubbleClass} style={{ whiteSpace: "pre-wrap" }}>{cleanMarkdown(m.text)}</div>
                     </div>
                   );
                 }
@@ -585,38 +610,131 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
                   );
                 }
 
-                if (m.kind === "date_picker") {
+                if (m.kind === "date_picker" || m.kind === "calendar_picker") {
+                  const daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+                  const firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
+                  const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                  const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+                  
+                  const isDateDisabled = (day: number) => {
+                    const date = new Date(calendarYear, calendarMonth, day);
+                    const tomorrow = new Date();
+                    tomorrow.setDate(tomorrow.getDate() + 1);
+                    tomorrow.setHours(0, 0, 0, 0);
+                    return date < tomorrow || date.getDay() === 0;
+                  };
+                  
+                  const handleDayClick = (day: number) => {
+                    if (isDateDisabled(day)) return;
+                    const dateStr = `${calendarYear}-${String(calendarMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                    setSelectedDate(dateStr);
+                  };
+                  
+                  const selectedDay = selectedDate ? parseInt(selectedDate.split('-')[2]) : null;
+                  const selectedMonthNum = selectedDate ? parseInt(selectedDate.split('-')[1]) - 1 : null;
+                  const selectedYearNum = selectedDate ? parseInt(selectedDate.split('-')[0]) : null;
+                  
                   return (
                     <div key={m.id} className="flex justify-start">
-                      <div className="max-w-[90%] rounded-2xl rounded-bl-md bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200 shadow-soft p-4">
-                        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-blue-700 mb-3">📅 Selecionar Data</p>
-                        <div className="flex flex-col gap-2">
-                          <input
-                            type="date"
-                            value={selectedDate}
-                            min={getMinDate()}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                            className="h-12 w-full rounded-xl border border-blue-200 bg-white px-4 text-sm outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-100"
-                          />
-                          <div className="flex gap-2">
+                      <div className="w-full max-w-[300px] rounded-2xl rounded-bl-md bg-white border border-black/10 shadow-lg p-4">
+                        {/* Month navigation */}
+                        <div className="flex items-center justify-between mb-4">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (calendarMonth === 0) {
+                                setCalendarMonth(11);
+                                setCalendarYear(calendarYear - 1);
+                              } else {
+                                setCalendarMonth(calendarMonth - 1);
+                              }
+                            }}
+                            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          >
+                            <svg className="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M15 18l-6-6 6-6" />
+                            </svg>
+                          </button>
+                          <span className="text-sm font-semibold text-gray-800">
+                            {monthNames[calendarMonth]} {calendarYear}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (calendarMonth === 11) {
+                                setCalendarMonth(0);
+                                setCalendarYear(calendarYear + 1);
+                              } else {
+                                setCalendarMonth(calendarMonth + 1);
+                              }
+                            }}
+                            className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                          >
+                            <svg className="w-5 h-5 text-gray-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M9 18l6-6-6-6" />
+                            </svg>
+                          </button>
+                        </div>
+                        
+                        {/* Day names */}
+                        <div className="grid grid-cols-7 gap-1 mb-2">
+                          {dayNames.map((day) => (
+                            <div key={day} className="text-center text-xs font-medium text-gray-400 py-1">
+                              {day}
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {/* Days grid */}
+                        <div className="grid grid-cols-7 gap-1">
+                          {Array.from({ length: firstDayOfMonth }).map((_, i) => (
+                            <div key={`empty-${i}`} className="h-9" />
+                          ))}
+                          
+                          {Array.from({ length: daysInMonth }).map((_, i) => {
+                            const day = i + 1;
+                            const disabled = isDateDisabled(day);
+                            const isSelected = selectedDay === day && selectedMonthNum === calendarMonth && selectedYearNum === calendarYear;
+                            
+                            return (
+                              <button
+                                key={day}
+                                type="button"
+                                onClick={() => handleDayClick(day)}
+                                disabled={disabled}
+                                className={`h-9 w-full rounded-lg text-sm font-medium transition-all ${
+                                  isSelected
+                                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-md"
+                                    : disabled
+                                    ? "text-gray-300 cursor-not-allowed"
+                                    : "text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                                }`}
+                              >
+                                {day}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        
+                        {/* Confirm button */}
+                        <div className="mt-4 flex gap-2">
+                          <button
+                            type="button"
+                            onClick={handleDateConfirm}
+                            disabled={!selectedDate}
+                            className="flex-1 h-11 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-sm font-semibold text-white shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            Confirmar Data
+                          </button>
+                          {reservationStep && (
                             <button
                               type="button"
-                              onClick={handleDateConfirm}
-                              disabled={!selectedDate}
-                              className="flex-1 h-11 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 text-sm font-semibold text-white shadow-soft disabled:opacity-50"
+                              onClick={handleReservationCancel}
+                              className="h-11 px-3 rounded-xl border border-gray-200 text-gray-600 text-sm font-medium hover:bg-gray-50"
                             >
-                              ✓ Confirmar
+                              ✕
                             </button>
-                            {reservationStep && (
-                              <button
-                                type="button"
-                                onClick={handleReservationCancel}
-                                className="h-11 px-4 rounded-xl border border-red-200 text-red-600 text-sm font-medium hover:bg-red-50"
-                              >
-                                Cancelar
-                              </button>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -737,19 +855,7 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
                   );
                 }
 
-                // whatsapp_cta
-                return (
-                  <div key={m.id} className="flex justify-start">
-                    <a
-                      href={m.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-3 text-sm font-semibold text-white shadow-soft hover:shadow-md transition-shadow"
-                    >
-                      {m.label ?? "WhatsApp"}
-                    </a>
-                  </div>
-                );
+                return null;
               })}
               
               {isLoading && !reservationStep && (
@@ -779,14 +885,6 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
                     {label}
                   </button>
                 ))}
-                <a
-                  href={whatsappHref}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-3 py-1.5 text-xs font-semibold text-white shadow-soft hover:shadow-md transition-shadow"
-                >
-                  WhatsApp
-                </a>
               </div>
             )}
           </div>
@@ -828,10 +926,11 @@ Por favor, usa a ferramenta criar_reserva com estes dados: produto="${reservatio
 
       {/* Toggle button */}
       <button
+        ref={toggleBtnRef}
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="group inline-flex items-center gap-2 rounded-full bg-[#0F0F0F] px-4 py-3 text-sm font-semibold text-white shadow-xl shadow-black/20 hover:translate-y-[-2px] transition"
-        aria-label={open ? "Fechar chat" : "Abrir chat"}
+        aria-label={open ? "Fechar" : "Abrir chat"}
       >
         <span className="relative inline-flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600">
           <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor">

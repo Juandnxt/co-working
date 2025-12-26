@@ -122,13 +122,127 @@
   "precos": {
     "page": {
       "label": "Prices",
-      "title": "Plans and Offers Gaia Coworking",
-      "subtitle": "Choose the perfect option for your work. From flexible spots to private offices, we have the ideal space for you in Vila Nova de Gaia."
+      "title": "Gaia Coworking Plans",
+      "subtitle": "Choose the perfect option for your work. From flexible spots to dedicated desks, we have the ideal space for you in Vila Nova de Gaia."
     },
-    "tabs": {
-      "ofertas": "Offers",
-      "escritorios": "Offices",
-      "salas": "Meeting Rooms"
+    "viewOptions": "View Options",
+    "clickToBook": "Click an option to book",
+    "close": "Close",
+    "ivaNote": "+ VAT • Secure payment with Stripe",
+    "cta": {
+      "title": "Not sure which plan to choose?",
+      "subtitle": "Talk to us and we'll help you find the perfect solution for your work.",
+      "button": "Contact"
+    },
+    "units": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month",
+      "hour": "Hour",
+      "pack": "Pack",
+      "halfDay": "4h",
+      "monthly": "Monthly"
+    },
+    "products": {
+      "lugar-flexivel": {
+        "type": "Shared Tables",
+        "typeDisplay": "Shared Tables (hot desks)",
+        "description": "Total flexibility: choose an available table and change whenever you want.",
+        "highlights": ["No commitment", "Ideal for day pass", "Natural networking"],
+        "subtypes": {
+          "daily": "Day Pass",
+          "weekly": "Weekly Pass",
+          "pack3": "3-day Pack",
+          "pack5": "5-day Pack",
+          "pack10": "10-day Pack"
+        }
+      },
+      "lugar-fixo": {
+        "type": "Fixed Spot",
+        "typeDisplay": "Fixed Spot",
+        "description": "Your guaranteed spot: chair reserved exclusively for you at a shared table.",
+        "highlights": ["Always available", "Shared table", "Fixed community"],
+        "subtypes": {
+          "weekly": "Weekly",
+          "monthly": "Monthly"
+        }
+      },
+      "mesa-fixa": {
+        "type": "Fixed Desk",
+        "typeDisplay": "Fixed Desk",
+        "description": "Privacy and your own space: desk reserved exclusively for you.",
+        "highlights": ["Exclusive desk", "Printer included", "Common area"],
+        "subtypes": {
+          "weekly": "Weekly",
+          "monthly": "Monthly",
+          "premium": "Full-time Premium"
+        }
+      },
+      "part-time": {
+        "type": "Part-time",
+        "typeDisplay": "Part-time",
+        "description": "Flexible and affordable: partial access for those who don't need to be there every day.",
+        "highlights": ["Days of your choice", "Coffee included", "Meeting room"],
+        "subtypes": {
+          "pack2": "2 days/week Pack",
+          "pack10": "10 days/month Pack"
+        }
+      },
+      "escritorio-grande": {
+        "type": "Large Private Office",
+        "typeDisplay": "Large Private Office",
+        "description": "Private office for 2-3 people, spacious for small teams.",
+        "highlights": ["2-3 people", "Total privacy", "Ideal for teams"],
+        "subtypes": {
+          "hourly": "Per Hour",
+          "daily": "Per Day",
+          "monthly": "Monthly"
+        }
+      },
+      "escritorio-medio": {
+        "type": "Medium Private Office",
+        "typeDisplay": "Medium Private Office",
+        "description": "Private office for 1-2 people, suitable for working or receiving guests.",
+        "highlights": ["1-2 people", "Comfortable", "Private meetings"],
+        "subtypes": {
+          "hourly": "Per Hour",
+          "daily": "Per Day",
+          "monthly": "Monthly"
+        }
+      },
+      "escritorio-pequeno": {
+        "type": "Small Private Office 1",
+        "typeDisplay": "Small Private Office",
+        "description": "Private office for 1 person, ideal for working alone with total privacy.",
+        "highlights": ["1 person", "Absolute silence", "Total focus"],
+        "subtypes": {
+          "hourly": "Per Hour",
+          "daily": "Per Day",
+          "monthly": "Monthly"
+        }
+      },
+      "sala-grande": {
+        "type": "Large Meeting Room",
+        "typeDisplay": "Large Meeting Room",
+        "description": "Large room for team meetings, presentations or workshops. Up to 8 people.",
+        "highlights": ["Up to 8 people", "Monitor/Projector", "Ideal for workshops"],
+        "subtypes": {
+          "hourly": "Per Hour",
+          "halfDay": "Half-day",
+          "fullDay": "Full Day"
+        }
+      },
+      "sala-pequena": {
+        "type": "Small Meeting Room 1",
+        "typeDisplay": "Small Meeting Room",
+        "description": "Small room ideal for calls, interviews or quick meetings. 1-2 people.",
+        "highlights": ["1-2 people", "Private calls", "Interviews"],
+        "subtypes": {
+          "hourly": "Per Hour",
+          "halfDay": "Half-day",
+          "fullDay": "Full Day"
+        }
+      }
     }
   },
   "espacos": {

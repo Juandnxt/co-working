@@ -122,13 +122,127 @@
   "precos": {
     "page": {
       "label": "Preços",
-      "title": "Planos e Ofertas Gaia Coworking",
-      "subtitle": "Escolhe a opção perfeita para o teu trabalho. Desde lugares flexíveis até escritórios privados, temos o espaço ideal para ti em Vila Nova de Gaia."
+      "title": "Planos Gaia Coworking",
+      "subtitle": "Escolhe a opção perfeita para o teu trabalho. Desde lugares flexíveis até mesas dedicadas, temos o espaço ideal para ti em Vila Nova de Gaia."
     },
-    "tabs": {
-      "ofertas": "Ofertas",
-      "escritorios": "Escritórios",
-      "salas": "Salas de Reuniões"
+    "viewOptions": "Ver Opções",
+    "clickToBook": "Clica numa opção para reservar",
+    "close": "Fechar",
+    "ivaNote": "+ IVA • Pagamento seguro com Stripe",
+    "cta": {
+      "title": "Tens dúvidas sobre qual plano escolher?",
+      "subtitle": "Fala connosco e ajudamos-te a encontrar a solução perfeita para o teu trabalho.",
+      "button": "Contactar"
+    },
+    "units": {
+      "day": "Dia",
+      "week": "Semana",
+      "month": "Mês",
+      "hour": "Hora",
+      "pack": "Pack",
+      "halfDay": "4h",
+      "monthly": "Mensal"
+    },
+    "products": {
+      "lugar-flexivel": {
+        "type": "Mesas partilhadas",
+        "typeDisplay": "Mesas partilhadas (hot desks)",
+        "description": "Flexibilidade total: escolhe uma mesa disponível e muda quando quiseres.",
+        "highlights": ["Sem fidelização", "Ideal para day pass", "Networking natural"],
+        "subtypes": {
+          "daily": "Passe Diário",
+          "weekly": "Passe Semanal",
+          "pack3": "Pack 3 dias",
+          "pack5": "Pack 5 dias",
+          "pack10": "Pack 10 dias"
+        }
+      },
+      "lugar-fixo": {
+        "type": "Lugar Fixo",
+        "typeDisplay": "Lugar Fixo",
+        "description": "O teu lugar garantido: cadeira reservada exclusivamente para ti numa mesa partilhada.",
+        "highlights": ["Lugar sempre disponível", "Mesa partilhada", "Comunidade fixa"],
+        "subtypes": {
+          "weekly": "Semanal",
+          "monthly": "Mensal"
+        }
+      },
+      "mesa-fixa": {
+        "type": "Mesa Fixa",
+        "typeDisplay": "Mesa Fixa",
+        "description": "Privacidade e espaço próprio: mesa reservada exclusivamente para ti.",
+        "highlights": ["Mesa exclusiva", "Impressora incluída", "Espaço comum"],
+        "subtypes": {
+          "weekly": "Semanal",
+          "monthly": "Mensal",
+          "premium": "Full-time Premium"
+        }
+      },
+      "part-time": {
+        "type": "Part-time",
+        "typeDisplay": "Part-time",
+        "description": "Flexível e económico: acesso parcial para quem não precisa de estar todos os dias.",
+        "highlights": ["Dias à escolha", "Café incluído", "Sala reuniões"],
+        "subtypes": {
+          "pack2": "Pack 2 dias/semana",
+          "pack10": "Pack 10 dias/mês"
+        }
+      },
+      "escritorio-grande": {
+        "type": "Escritório Privado Grande",
+        "typeDisplay": "Escritório Privado Grande",
+        "description": "Escritório privado para 2-3 pessoas, espaçoso para equipas pequenas.",
+        "highlights": ["2-3 pessoas", "Privacidade total", "Ideal para equipas"],
+        "subtypes": {
+          "hourly": "Por Hora",
+          "daily": "Por Dia",
+          "monthly": "Mensal"
+        }
+      },
+      "escritorio-medio": {
+        "type": "Escritório Privado Médio",
+        "typeDisplay": "Escritório Privado Médio",
+        "description": "Escritório privado para 1-2 pessoas, adequado para trabalhar ou receber convidados.",
+        "highlights": ["1-2 pessoas", "Confortável", "Reuniões privadas"],
+        "subtypes": {
+          "hourly": "Por Hora",
+          "daily": "Por Dia",
+          "monthly": "Mensal"
+        }
+      },
+      "escritorio-pequeno": {
+        "type": "Escritório Privado Pequeno 1",
+        "typeDisplay": "Escritório Privado Pequeno",
+        "description": "Escritório privado para 1 pessoa, ideal para trabalhar sozinho com total privacidade.",
+        "highlights": ["1 pessoa", "Silêncio absoluto", "Foco total"],
+        "subtypes": {
+          "hourly": "Por Hora",
+          "daily": "Por Dia",
+          "monthly": "Mensal"
+        }
+      },
+      "sala-grande": {
+        "type": "Sala de Reuniões Grande",
+        "typeDisplay": "Sala de Reuniões Grande",
+        "description": "Sala grande para reuniões de equipa, apresentações ou workshops. Até 8 pessoas.",
+        "highlights": ["Até 8 pessoas", "Monitor/Projector", "Ideal para workshops"],
+        "subtypes": {
+          "hourly": "Por Hora",
+          "halfDay": "Meio-dia",
+          "fullDay": "Dia Completo"
+        }
+      },
+      "sala-pequena": {
+        "type": "Sala de Reuniões Pequena 1",
+        "typeDisplay": "Sala de Reuniões Pequena",
+        "description": "Sala pequena ideal para chamadas, entrevistas ou reuniões rápidas. 1-2 pessoas.",
+        "highlights": ["1-2 pessoas", "Chamadas privadas", "Entrevistas"],
+        "subtypes": {
+          "hourly": "Por Hora",
+          "halfDay": "Meio-dia",
+          "fullDay": "Dia Completo"
+        }
+      }
     }
   },
   "espacos": {

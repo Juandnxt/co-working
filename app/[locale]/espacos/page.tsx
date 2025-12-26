@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import { useTranslations } from "next-intl";
 import { getTranslations } from "next-intl/server";
 
 type Props = {
