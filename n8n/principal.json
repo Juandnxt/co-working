@@ -1,0 +1,392 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "e05bf1eb-8902-4711-beb1-136110b75941",
+          "responseMode": "lastNode",
+          "options": {
+            "allowedOrigins": "*"
+          }
+        },
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          736,
+          3328
+        ],
+        "id": "79bac426-0638-4e92-8bea-1f68fe6587bc",
+        "name": "Webhook Chat1",
+        "webhookId": "e05bf1eb-8902-4711-beb1-136110b75941"
+      },
+      {
+        "parameters": {
+          "mode": "runOnceForEachItem",
+          "jsCode": "return {\"answer\":$json.output}"
+        },
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          2240,
+          3328
+        ],
+        "id": "8ac5b985-b025-4317-94fa-53f9ba96bd7c",
+        "name": "Format Output1"
+      },
+      {
+        "parameters": {
+          "name": "consultar_precios",
+          "description": "Consulta los precios y planes disponibles en Gaia Coworking desde la base de datos. Usa esta tool cuando el usuario pregunte sobre precios, tarifas, cuánto cuesta, ofertas o planes disponibles.",
+          "workflowId": {
+            "__rl": true,
+            "mode": "id",
+            "value": "1VtE3CYK2EUdMQuj"
+          },
+          "specifyInputSchema": true,
+          "jsonSchemaExample": "{}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          1856,
+          3744
+        ],
+        "id": "2b3ff5dd-dee0-40bc-87c8-c73bd1829bbb",
+        "name": "consultar_precios1"
+      },
+      {
+        "parameters": {
+          "name": "verificar_disponibilidad",
+          "description": "Verifica si hay disponibilidad para un producto en fechas específicas. USA ESTA TOOL ANTES de crear cualquier reserva.",
+          "workflowId": {
+            "__rl": true,
+            "value": "08Rcm5h4olHW2ud3",
+            "mode": "id"
+          },
+          "specifyInputSchema": true,
+          "jsonSchemaExample": "{\n  \"producto\": \"Mesas partilhadas\",\n  \"fechas\": [\"2025-01-15\", \"2025-01-16\"]\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2064,
+          3744
+        ],
+        "id": "264a8134-04e1-4a83-aa21-ce27a03b495c",
+        "name": "verificar_disponibilidad1"
+      },
+      {
+        "parameters": {
+          "name": "crear_reserva",
+          "description": "Crea una reserva y genera el link de pago de Stripe. Solo usa cuando tengas: disponibilidad verificada, email y nombre del cliente.",
+          "workflowId": {
+            "__rl": true,
+            "value": "iMJjQTMmkiASALM2",
+            "mode": "id"
+          },
+          "specifyInputSchema": true,
+          "jsonSchemaExample": "{\n  \"producto\": \"Mesas partilhadas\",\n  \"subtipo\": \"Pack 3 dias\",\n  \"fechas\": [\"2025-01-15\", \"2025-01-17\", \"2025-01-20\"],\n  \"email\": \"cliente@email.com\",\n  \"nombre\": \"João Silva\",\n  \"precio_centavos\": 5500\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2272,
+          3744
+        ],
+        "id": "753ed7db-3db9-4a20-86f5-63e14b56b2e2",
+        "name": "crear_reserva1"
+      },
+      {
+        "parameters": {
+          "name": "enviar_correo_confirmacion",
+          "description": "Envía un email personalizado al cliente. Los emails de confirmación de reserva se envían automáticamente después del pago.",
+          "workflowId": {
+            "__rl": true,
+            "value": "yL2r5CR1mMMToCae",
+            "mode": "id"
+          },
+          "specifyInputSchema": true,
+          "jsonSchemaExample": "{\n  \"destinatario\": \"cliente@email.com\",\n  \"nombre\": \"João\",\n  \"asunto\": \"Informação Gaia Coworking\",\n  \"mensaje\": \"Obrigado pelo teu interesse!\"\n}"
+        },
+        "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+        "typeVersion": 1.3,
+        "position": [
+          2496,
+          3728
+        ],
+        "id": "d6b34f47-3ad2-47ff-960a-16c774c06614",
+        "name": "enviar_correo_confirmacion1"
+      },
+      {
+        "parameters": {
+          "rules": {
+            "values": [
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "check-file",
+                      "leftValue": "={{ $json.body.bs64_type }}",
+                      "rightValue": "application/pdf",
+                      "operator": {
+                        "type": "string",
+                        "operation": "notEmpty",
+                        "singleValue": true
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "file_data"
+              },
+              {
+                "conditions": {
+                  "options": {
+                    "caseSensitive": true,
+                    "leftValue": "",
+                    "typeValidation": "strict",
+                    "version": 2
+                  },
+                  "conditions": [
+                    {
+                      "id": "check-no-file",
+                      "leftValue": "={{ $json.body.bs64_type }}",
+                      "rightValue": "application/pdf",
+                      "operator": {
+                        "type": "string",
+                        "operation": "empty",
+                        "singleValue": true
+                      }
+                    }
+                  ],
+                  "combinator": "and"
+                },
+                "renameOutput": true,
+                "outputKey": "not_file_data"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.switch",
+        "typeVersion": 3.2,
+        "position": [
+          1024,
+          3328
+        ],
+        "id": "6b64ad2e-d1ce-4638-976c-ecf1b7435e69",
+        "name": "CHECK-TYPE"
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "msg-extract",
+                "name": "mensaje",
+                "value": "={{ $json.body.message }}",
+                "type": "string"
+              },
+              {
+                "id": "session-extract",
+                "name": "sessionId",
+                "value": "={{ $json.body.sessionId || 'default' }}",
+                "type": "string"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          1392,
+          3344
+        ],
+        "id": "a0368c35-236a-4dbb-8827-6243cf60702a",
+        "name": "Edit Fields"
+      },
+      {
+        "parameters": {
+          "promptType": "define",
+          "text": "={{ $('Edit Fields').item.json.mensaje }}",
+          "options": {
+            "systemMessage": "Eres Gaia, el asistente virtual de Gaia Coworking en Vila Nova de Gaia, Portugal.\n\nResponde SIEMPRE en el mismo idioma que usa el usuario.\n\nTienes estas herramientas disponibles que DEBES usar:\n\n1. **consultar_precios** - Úsala cuando pregunten por precios, tarifas, cuánto cuesta, ofertas. No necesita parámetros.\n\n2. **verificar_disponibilidad** - Úsala para verificar si hay sitio en fechas específicas. Parámetros: producto (string), fechas (array de strings YYYY-MM-DD)\n\n3. **crear_reserva** - Úsala para crear una reserva. Parámetros: producto, subtipo, fechas, email, nombre, precio_centavos\n\n4. **enviar_correo_confirmacion** - Para enviar emails personalizados.\n\nINSTRUCCIONES:\n- Cuando pregunten por precios → USA consultar_precios inmediatamente\n- Para reservas: primero verifica disponibilidad, luego pide email/nombre, luego crea reserva\n- Sé amigable y usa emojis 😊\n\nINFO BÁSICA:\n- Ubicación: Vila Nova de Gaia, Portugal\n- Horario: Lunes a Viernes, 09:00 - 19:00"
+          }
+        },
+        "type": "@n8n/n8n-nodes-langchain.agent",
+        "typeVersion": 1.7,
+        "position": [
+          1696,
+          3328
+        ],
+        "id": "cdd5632d-5a92-4dc1-bb98-148928756c37",
+        "name": "AI Agent"
+      },
+      {
+        "parameters": {
+          "options": {}
+        },
+        "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+        "typeVersion": 1.1,
+        "position": [
+          1344,
+          3776
+        ],
+        "id": "74c115de-e04b-42a5-bd3b-6d42fda8c36e",
+        "name": "OpenAI Chat Model",
+        "credentials": {
+          "openAiApi": {
+            "id": "DJ3fsPGxIo6C0DuD",
+            "name": "OpenAi account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "sessionIdType": "customKey",
+          "sessionKey": "={{ $('Edit Fields').item.json.sessionId || 'default' }}",
+          "contextWindowLength": 10
+        },
+        "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+        "typeVersion": 1.3,
+        "position": [
+          1568,
+          3776
+        ],
+        "id": "5eb9e68e-b589-4c0e-9fc9-f4caa3bca860",
+        "name": "Postgres Chat Memory",
+        "credentials": {
+          "postgres": {
+            "id": "Rm9Jc6KNvQMstpzQ",
+            "name": "Postgres account"
+          }
+        }
+      }
+    ],
+    "connections": {
+      "Webhook Chat1": {
+        "main": [
+          [
+            {
+              "node": "CHECK-TYPE",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "consultar_precios1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "verificar_disponibilidad1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "crear_reserva1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "enviar_correo_confirmacion1": {
+        "ai_tool": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_tool",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "CHECK-TYPE": {
+        "main": [
+          [],
+          [
+            {
+              "node": "Edit Fields",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Edit Fields": {
+        "main": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "AI Agent": {
+        "main": [
+          [
+            {
+              "node": "Format Output1",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "OpenAI Chat Model": {
+        "ai_languageModel": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_languageModel",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Postgres Chat Memory": {
+        "ai_memory": [
+          [
+            {
+              "node": "AI Agent",
+              "type": "ai_memory",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+    }
+  }

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const N8N_WEBHOOK_BASE_URL = "https://dnxt.app.n8n.cloud/webhook";
+// URL base del webhook de n8n - configurable via variable de entorno
+// Ejemplo: N8N_WEBHOOK_URL=https://tu-instancia.app.n8n.cloud/webhook
+const N8N_WEBHOOK_BASE_URL = process.env.N8N_WEBHOOK_URL || "https://n8n.gaiacoworking.pt/webhook";
 
 export async function POST(
   request: NextRequest,
@@ -9,14 +11,22 @@ export async function POST(
   try {
     const { path } = await params;
     const body = await request.json();
+    
+    // Construir la URL del webhook de n8n
+    // Si N8N_WEBHOOK_URL ya incluye el path completo, usarla directamente
+    // Si no, agregar el path
+    let webhookUrl: string;
+    if (N8N_WEBHOOK_BASE_URL.includes(path)) {
+      webhookUrl = N8N_WEBHOOK_BASE_URL;
+    } else {
+      webhookUrl = `${N8N_WEBHOOK_BASE_URL}/${path}`;
+    }
+    
+    console.log(`[n8n Proxy] URL configurada: ${N8N_WEBHOOK_BASE_URL}`);
+    console.log(`[n8n Proxy] Enviando a: ${webhookUrl}`);
+    console.log(`[n8n Proxy] Body:`, JSON.stringify(body, null, 2));
 
-    console.log("Webhook request received:", { path, body });
-
-    // Construir la URL completa del webhook de n8n
-    const webhookUrl = `${N8N_WEBHOOK_BASE_URL}/${path}`;
-    console.log("Calling n8n webhook:", webhookUrl);
-
-    // Enviar la solicitud al webhook de n8n
+    // Reenviar la petición al webhook de n8n
     const response = await fetch(webhookUrl, {
       method: "POST",
       headers: {
@@ -25,120 +35,87 @@ export async function POST(
       body: JSON.stringify(body),
     });
 
-    console.log("n8n response status:", response.status, response.statusText);
-    console.log("n8n response headers:", Object.fromEntries(response.headers.entries()));
-
-    // Obtener el contenido de la respuesta
-    // Clonar la respuesta para poder leerla múltiples veces si es necesario
-    const contentType = response.headers.get("content-type") || "";
-    let data;
-    
-    // Leer primero como texto para poder intentar parsear después
-    const rawText = await response.text();
-    console.log("n8n raw response:", rawText);
-    console.log("Content-Type:", contentType);
-
-    // Intentar parsear como JSON
-    if (contentType.includes("application/json") || rawText.trim().startsWith("{")) {
-      try {
-        data = JSON.parse(rawText);
-        console.log("Parsed as JSON:", data);
-      } catch (error) {
-        // Si falla el parseo JSON, tratar como texto plano
-        console.log("Failed to parse as JSON, treating as plain text");
-        data = { response: rawText, message: rawText, text: rawText };
-      }
-    } else {
-      // Si no es JSON, devolver como mensaje
-      console.log("Treating as plain text");
-      data = { response: rawText, message: rawText, text: rawText };
-    }
-
-    console.log("n8n response data:", JSON.stringify(data, null, 2));
-
+    // Si n8n no está disponible o el workflow no está activo
     if (!response.ok) {
-      console.error(`Error from n8n webhook: ${response.status} ${response.statusText}`, data);
+      const errorText = await response.text();
+      console.error(`n8n webhook error (${response.status}):`, errorText);
       
-      // Manejar el caso específico cuando el workflow no está activo
-      if (response.status === 404 && data?.message?.includes("not registered")) {
+      // Verificar si el error es porque el workflow no está registrado
+      if (response.status === 404 || errorText.includes("not registered")) {
         return NextResponse.json(
           { 
             error: "El workflow de n8n no está activado",
-            message: "Por favor, activa el workflow en n8n para que el chatbot funcione.",
-            hint: data.hint || "Activa el workflow usando el toggle en la esquina superior derecha del editor de n8n"
+            message: "Por favor, activa el workflow en n8n para recibir mensajes.",
+            details: errorText,
+            debug: {
+              urlUsada: webhookUrl,
+              urlConfigurada: N8N_WEBHOOK_BASE_URL,
+              path: path,
+              sugerencia: "Verifica que N8N_WEBHOOK_URL en .env sea la URL del webhook (no del workflow). Ejemplo: https://tu-instancia.app.n8n.cloud/webhook"
+            }
           },
-          { status: 503 } // Service Unavailable - más apropiado que 404
+          { status: 503 }
         );
       }
       
       return NextResponse.json(
         { 
-          error: "Error al procesar la solicitud del chatbot",
-          details: data
+          error: "Error al comunicarse con el chatbot",
+          message: errorText || `Error ${response.status}`,
         },
         { status: response.status }
       );
     }
 
-    // n8n puede devolver la respuesta en diferentes formatos:
-    // 1. Array de objetos: [{ json: { answer: "..." } }]
-    // 2. Objeto directo: { answer: "..." } o { response: "..." }
-    // 3. String directo: "respuesta"
-    // 4. En el body de un objeto: { body: "respuesta" }
+    // Obtener la respuesta de n8n
+    const contentType = response.headers.get("content-type");
     
-    let processedData = data;
-    
-    // Si es un array (formato típico de n8n)
-    if (Array.isArray(data) && data.length > 0) {
-      // Tomar el primer elemento
-      const firstItem = data[0];
-      // n8n suele poner los datos en .json o directamente en el objeto
-      processedData = firstItem.json || firstItem.body || firstItem;
-    }
-    
-    // Si es un objeto con body (respuesta HTTP)
-    if (processedData && typeof processedData === 'object' && processedData.body) {
-      // Intentar parsear el body si es string
-      if (typeof processedData.body === 'string') {
-        try {
-          processedData = JSON.parse(processedData.body);
-        } catch {
-          processedData = { answer: processedData.body, response: processedData.body, message: processedData.body, text: processedData.body };
-        }
-      } else {
-        processedData = processedData.body;
-      }
-    }
-    
-    // Asegurar que siempre sea un objeto con campos estándar
-    if (typeof processedData === 'string') {
-      processedData = { answer: processedData, response: processedData, message: processedData, text: processedData };
-    } else if (processedData && typeof processedData === 'object') {
-      // Si el objeto tiene "answer", asegurarse de que también esté en otros campos comunes
-      if (processedData.answer && !processedData.response) {
-        processedData.response = processedData.answer;
-        processedData.message = processedData.answer;
-        processedData.text = processedData.answer;
-      }
+    if (contentType?.includes("application/json")) {
+      const data = await response.json();
+      console.log("n8n response:", JSON.stringify(data, null, 2));
+      return NextResponse.json(data);
+    } else {
+      const text = await response.text();
+      console.log("n8n response (text):", text);
+      return NextResponse.json({ response: text });
     }
 
-    console.log("Processed n8n data:", JSON.stringify(processedData, null, 2));
-
-    return NextResponse.json(processedData);
-  } catch (error: any) {
-    console.error("Error calling n8n webhook:", error);
-    console.error("Error details:", {
-      message: error.message,
-      stack: error.stack,
-      cause: error.cause
-    });
+  } catch (error: unknown) {
+    console.error("Error in webhook proxy:", error);
+    
+    // Si es un error de conexión (n8n no disponible)
+    if (error instanceof TypeError && error.message.includes("fetch")) {
+      return NextResponse.json(
+        { 
+          error: "No se pudo conectar con el servidor de n8n",
+          message: "El servidor de chatbot no está disponible. Por favor, intente más tarde o contacte via WhatsApp.",
+        },
+        { status: 503 }
+      );
+    }
+    
+    const errorMessage = error instanceof Error ? error.message : "Error desconocido";
     return NextResponse.json(
       { 
-        error: "Error al conectar con el chatbot",
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        error: "Error interno del servidor",
+        message: errorMessage,
       },
       { status: 500 }
     );
   }
+}
+
+// También soportar GET para pruebas
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ path: string }> }
+) {
+  const { path } = await params;
+  return NextResponse.json({ 
+    message: "Webhook proxy activo",
+    path,
+    n8nUrl: `${N8N_WEBHOOK_BASE_URL}/${path}`,
+    note: "Use POST para enviar mensajes al chatbot"
+  });
 }
 

@@ -3,87 +3,64 @@
 import { usePathname, useRouter } from "next/navigation";
 import { locales } from "@/i18n";
 
-const languageNames: Record<string, { name: string; code: string }> = {
-  pt: { name: "Português", code: "PT" },
-  en: { name: "English", code: "EN" }
+const localeLabels: Record<string, { label: string; flag: string }> = {
+  pt: { label: "Português", flag: "🇵🇹" },
+  en: { label: "English", flag: "🇬🇧" },
 };
 
 export default function LanguageSwitcher() {
   const pathname = usePathname() || "/";
   const router = useRouter();
-  
-  // Detectar el locale actual
+
+  // Extract current locale from path
   const segments = pathname.split("/").filter(Boolean);
-  const currentLocale = segments[0] && locales.includes(segments[0] as any) 
+  const currentLocale = segments[0] && (locales as readonly string[]).includes(segments[0]) 
     ? segments[0] 
     : "pt";
-  
-  const switchLanguage = (newLocale: string) => {
-    // Guardar la posición del scroll antes de cambiar
-    const scrollY = window.scrollY;
-    const scrollX = window.scrollX;
+
+  const handleChange = (newLocale: string) => {
+    if (newLocale === currentLocale) return;
+
+    let newPath: string;
     
-    const newSegments = [...segments];
-    
-    // Si ya hay un locale, reemplazarlo
-    if (segments[0] && locales.includes(segments[0] as any)) {
-      newSegments[0] = newLocale;
+    // If current path has a locale prefix, replace it
+    if ((locales as readonly string[]).includes(segments[0])) {
+      segments[0] = newLocale;
+      newPath = `/${segments.join("/")}`;
     } else {
-      // Si no hay locale, agregarlo al inicio
-      newSegments.unshift(newLocale);
+      // Add locale prefix
+      newPath = `/${newLocale}${pathname}`;
     }
-    
-    const newPath = `/${newSegments.join("/")}`;
-    
-    // Guardar la posición en sessionStorage para restaurarla después
-    sessionStorage.setItem('scrollPosition', JSON.stringify({ x: scrollX, y: scrollY }));
-    
-    // Usar replace para no agregar al historial
-    router.replace(newPath);
-    
-    // Restaurar la posición del scroll después de que la página se haya renderizado
-    // Usamos requestAnimationFrame para asegurar que el DOM esté listo
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        const saved = sessionStorage.getItem('scrollPosition');
-        if (saved) {
-          try {
-            const { x, y } = JSON.parse(saved);
-            window.scrollTo(x, y);
-            sessionStorage.removeItem('scrollPosition');
-          } catch (e) {
-            // Si hay error, usar la posición guardada directamente
-            window.scrollTo(scrollX, scrollY);
-          }
-        } else {
-          window.scrollTo(scrollX, scrollY);
-        }
-      });
-    });
+
+    router.push(newPath);
   };
 
   return (
-    <div className="flex items-center gap-2 text-xs font-semibold rounded-full border border-black/10 px-3 py-1.5 bg-white shadow-soft">
+    <div className="flex items-center gap-1 rounded-full border border-black/10 bg-white p-1 shadow-soft">
       {locales.map((locale) => {
-        const isActive = currentLocale === locale;
+        const isActive = locale === currentLocale;
+        const { flag, label } = localeLabels[locale] || { label: locale.toUpperCase(), flag: "" };
+        
         return (
           <button
             key={locale}
-            onClick={() => switchLanguage(locale)}
-            className={`px-1 transition-colors ${
-              isActive 
-                ? "text-blue-600 font-bold" 
-                : "text-black/60 hover:text-black/80 cursor-pointer"
-            }`}
             type="button"
+            onClick={() => handleChange(locale)}
+            className={`
+              inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all
+              ${isActive 
+                ? "bg-[#0F0F0F] text-white shadow-soft" 
+                : "text-black/60 hover:bg-[#F7F7F5] hover:text-black"
+              }
+            `}
+            aria-label={`Mudar para ${label}`}
+            aria-current={isActive ? "true" : undefined}
           >
-            {languageNames[locale]?.code || locale.toUpperCase()}
+            <span className="text-sm">{flag}</span>
+            <span className="hidden sm:inline">{locale.toUpperCase()}</span>
           </button>
         );
       })}
-      {locales.length > 1 && (
-        <span className="text-black/30">|</span>
-      )}
     </div>
   );
 }

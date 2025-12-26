@@ -1,0 +1,338 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "httpMethod": "POST",
+          "path": "stripe-pago-completado",
+          "responseMode": "responseNode",
+          "options": {}
+        },
+        "id": "472ba819-c1f0-4e74-8085-071d5fe991af",
+        "name": "Stripe Webhook",
+        "type": "n8n-nodes-base.webhook",
+        "typeVersion": 2.1,
+        "position": [
+          -608,
+          96
+        ],
+        "webhookId": "stripe-pago-completado"
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "options": {
+              "caseSensitive": true,
+              "leftValue": "",
+              "typeValidation": "strict",
+              "version": 2
+            },
+            "conditions": [
+              {
+                "id": "check-type",
+                "leftValue": "={{ $json.body.type }}",
+                "rightValue": "checkout.session.completed",
+                "operator": {
+                  "type": "string",
+                  "operation": "equals"
+                }
+              }
+            ],
+            "combinator": "and"
+          },
+          "options": {}
+        },
+        "id": "f6664811-c7a2-4645-a9ef-a7c6dd39b064",
+        "name": "Es Pago Completado?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 2.2,
+        "position": [
+          -384,
+          96
+        ]
+      },
+      {
+        "parameters": {
+          "assignments": {
+            "assignments": [
+              {
+                "id": "1",
+                "name": "reserva_id",
+                "value": "={{ $json.body.data.object.metadata.bookingId }}",
+                "type": "string"
+              },
+              {
+                "id": "2",
+                "name": "email",
+                "value": "={{ $json.body.data.object.customer_details.email }}",
+                "type": "string"
+              },
+              {
+                "id": "3",
+                "name": "nombre",
+                "value": "={{ $json.body.data.object.customer_details.name || 'Cliente' }}",
+                "type": "string"
+              },
+              {
+                "id": "4",
+                "name": "stripe_session_id",
+                "value": "={{ $json.body.data.object.id }}",
+                "type": "string"
+              },
+              {
+                "id": "5",
+                "name": "stripe_payment_intent",
+                "value": "={{ $json.body.data.object.payment_intent }}",
+                "type": "string"
+              },
+              {
+                "id": "6",
+                "name": "amount",
+                "value": "={{ $json.body.data.object.amount_total }}",
+                "type": "number"
+              }
+            ]
+          },
+          "options": {}
+        },
+        "id": "880c7c18-d3b2-43e5-a93d-0bd470ddef8f",
+        "name": "Extraer Datos",
+        "type": "n8n-nodes-base.set",
+        "typeVersion": 3.4,
+        "position": [
+          -160,
+          -16
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "=UPDATE reservas SET\n  estado = 'confirmed',\n  stripe_session_id = '{{ $json.stripe_session_id }}',\n  stripe_payment_intent_id = '{{ $json.stripe_payment_intent }}',\n  cliente_email = '{{ $json.email }}',\n  cliente_nombre = '{{ $json.nombre }}',\n  confirmed_at = NOW()\nWHERE id = '{{ $json.reserva_id }}'::uuid\nRETURNING *;",
+          "options": {}
+        },
+        "id": "c330a7a3-4e11-46bf-b288-f0f534d8c89f",
+        "name": "Confirmar Reserva",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          64,
+          -16
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "Rm9Jc6KNvQMstpzQ",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "=INSERT INTO disponibilidad (fecha, producto_id, reserva_id, producto_nombre)\nSELECT \n  unnest(fechas_seleccionadas),\n  producto_id,\n  id,\n  producto_nombre\nFROM reservas\nWHERE id = '{{ $('Extraer Datos').first().json.reserva_id }}'::uuid\nON CONFLICT DO NOTHING;",
+          "options": {}
+        },
+        "id": "8e22d200-a277-42d3-9ace-8c263faba9fa",
+        "name": "Registrar Fechas",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          288,
+          -16
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "Rm9Jc6KNvQMstpzQ",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const reserva = $('Confirmar Reserva').first().json;\nconst datos = $('Extraer Datos').first().json;\n\nconst fechas = reserva.fechas_seleccionadas || [];\nconst fechasStr = fechas.map(f => {\n  const d = new Date(f);\n  return d.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long' });\n}).join('<br>');\n\nconst precio = (datos.amount / 100).toFixed(2);\n\nconst html = `\n<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 20px; }\n    .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }\n    .header { background: linear-gradient(135deg, #2563eb, #9333ea); color: white; padding: 30px; text-align: center; }\n    .content { padding: 30px; }\n    .badge { background: #10b981; color: white; padding: 8px 16px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 20px; }\n    .detail-box { background: #f8f8f8; border-radius: 8px; padding: 20px; margin: 20px 0; }\n    .detail-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }\n    .detail-row:last-child { border-bottom: none; }\n    .price { font-size: 24px; color: #2563eb; font-weight: bold; }\n    .dates-box { background: #eff6ff; border-radius: 8px; padding: 15px; margin: 20px 0; }\n    .footer { background: #f8f8f8; padding: 20px; text-align: center; color: #666; font-size: 14px; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h1>🌿 Gaia Coworking</h1>\n      <p>A tua reserva está confirmada!</p>\n    </div>\n    <div class=\"content\">\n      <span class=\"badge\">✅ Pagamento Confirmado</span>\n      <h2>Olá ${datos.nombre}!</h2>\n      <p>A tua reserva foi confirmada com sucesso. Aguardamos-te no Gaia Coworking!</p>\n      \n      <div class=\"detail-box\">\n        <div class=\"detail-row\"><span>Reserva ID</span><strong>${reserva.id.substring(0, 8).toUpperCase()}</strong></div>\n        <div class=\"detail-row\"><span>Produto</span><strong>${reserva.producto_nombre}</strong></div>\n        <div class=\"detail-row\"><span>Plano</span><strong>${reserva.plan_nombre}</strong></div>\n        <div class=\"detail-row\"><span>Total Pago</span><span class=\"price\">${precio}€</span></div>\n      </div>\n      \n      <div class=\"dates-box\">\n        <strong>📅 Datas Reservadas:</strong><br>\n        ${fechasStr}\n      </div>\n      \n      <h3>📍 Informações</h3>\n      <p><strong>Morada:</strong> Vila Nova de Gaia</p>\n      <p><strong>Horário:</strong> Segunda a Sexta, 09:00 - 19:00</p>\n      <p><strong>Incluído:</strong> Wi-Fi, café, água, áreas comuns</p>\n    </div>\n    <div class=\"footer\">\n      <p>Dúvidas? Responde a este email.</p>\n      <p>gaiacoworking.pt</p>\n    </div>\n  </div>\n</body>\n</html>`;\n\nreturn [{ json: { to: datos.email, subject: '✅ Reserva Confirmada - Gaia Coworking', html: html, reserva_id: reserva.id } }];"
+        },
+        "id": "6b4c785c-f53f-4fab-a469-7068ca0e551c",
+        "name": "Preparar Email",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          512,
+          -16
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $json.to }}",
+          "subject": "={{ $json.subject }}",
+          "message": "={{ $json.html }}",
+          "options": {}
+        },
+        "id": "5aed95e4-b457-4061-9904-50ee8abe23c4",
+        "name": "Enviar Email",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          720,
+          -16
+        ],
+        "webhookId": "96172ef3-92e1-4f62-b4eb-b77071e8733d",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "gkXp3Ll9QtIjBFFR",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "=INSERT INTO emails_enviados (reserva_id, destinatario, asunto, tipo, estado)\nVALUES ('{{ $('Preparar Email').first().json.reserva_id }}'::uuid, '{{ $json.to }}', '{{ $json.subject }}', 'confirmacion', 'sent');",
+          "options": {}
+        },
+        "id": "6c85f032-6580-4bac-b886-8812adc441a8",
+        "name": "Log Email",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          944,
+          -16
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "Rm9Jc6KNvQMstpzQ",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={\"received\": true, \"status\": \"completed\"}",
+          "options": {}
+        },
+        "id": "ef09f54e-e0cd-47d7-97de-366f5a2b23c1",
+        "name": "Responder OK",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          1168,
+          -16
+        ]
+      },
+      {
+        "parameters": {
+          "respondWith": "json",
+          "responseBody": "={\"received\": true, \"ignored\": true}",
+          "options": {}
+        },
+        "id": "5039c539-cf3a-475f-9564-7a48fa6890ea",
+        "name": "Ignorar",
+        "type": "n8n-nodes-base.respondToWebhook",
+        "typeVersion": 1.1,
+        "position": [
+          -160,
+          192
+        ]
+      }
+    ],
+    "connections": {
+      "Stripe Webhook": {
+        "main": [
+          [
+            {
+              "node": "Es Pago Completado?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Es Pago Completado?": {
+        "main": [
+          [
+            {
+              "node": "Extraer Datos",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Ignorar",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Extraer Datos": {
+        "main": [
+          [
+            {
+              "node": "Confirmar Reserva",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Confirmar Reserva": {
+        "main": [
+          [
+            {
+              "node": "Registrar Fechas",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Registrar Fechas": {
+        "main": [
+          [
+            {
+              "node": "Preparar Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Preparar Email": {
+        "main": [
+          [
+            {
+              "node": "Enviar Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Enviar Email": {
+        "main": [
+          [
+            {
+              "node": "Log Email",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Log Email": {
+        "main": [
+          [
+            {
+              "node": "Responder OK",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+    }
+  }

@@ -1,0 +1,157 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "id": "46b6e4a8-87f9-4ea9-ba47-32bf66c6142f",
+        "name": "When Executed by Another Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          32,
+          -144
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "const input = $input.first().json;\n\nif (!input.destinatario) {\n  return [{ json: { response: 'Preciso do email do destinatário.', skip: true } }];\n}\n\nconst html = '<div style=\"font-family:Arial;max-width:600px;margin:0 auto;\">' +\n  '<div style=\"background:linear-gradient(135deg,#2563eb,#9333ea);color:white;padding:30px;text-align:center;border-radius:12px 12px 0 0;\">' +\n  '<h1>🌿 Gaia Coworking</h1></div>' +\n  '<div style=\"padding:30px;background:white;\">' +\n  '<h2>Olá ' + (input.nombre || 'Cliente') + '!</h2>' +\n  '<p>' + (input.mensaje || '') + '</p>' +\n  '<hr><p>📍 Vila Nova de Gaia | 🕐 09:00-19:00</p>' +\n  '</div></div>';\n\nreturn [{ json: { \n  to: input.destinatario,\n  subject: input.asunto || 'Gaia Coworking',\n  html: html,\n  skip: false\n} }];"
+        },
+        "id": "01f9191c-9869-4b36-a3db-5ef5bc432ef2",
+        "name": "Prepare",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          240,
+          -144
+        ]
+      },
+      {
+        "parameters": {
+          "conditions": {
+            "boolean": [
+              {
+                "value1": "={{ $json.skip }}",
+                "value2": true
+              }
+            ]
+          }
+        },
+        "id": "8faa9b0a-9c87-43ad-94d5-df823db0e540",
+        "name": "Skip?",
+        "type": "n8n-nodes-base.if",
+        "typeVersion": 1,
+        "position": [
+          448,
+          -144
+        ]
+      },
+      {
+        "parameters": {
+          "sendTo": "={{ $json.to }}",
+          "subject": "={{ $json.subject }}",
+          "message": "={{ $json.html }}",
+          "options": {}
+        },
+        "id": "55b29ecd-5c26-4e45-93aa-7dc2d9a68d60",
+        "name": "Gmail",
+        "type": "n8n-nodes-base.gmail",
+        "typeVersion": 2.1,
+        "position": [
+          640,
+          -240
+        ],
+        "webhookId": "3e1177f3-421e-4faa-976c-ae978b4c07eb",
+        "credentials": {
+          "gmailOAuth2": {
+            "id": "gkXp3Ll9QtIjBFFR",
+            "name": "Gmail account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "jsCode": "const p = $('Prepare').first().json;\nreturn [{ json: { response: '✅ Email enviado para ' + p.to } }];"
+        },
+        "id": "ae82d920-9469-4b8b-96de-b9c8797e28a2",
+        "name": "Success",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          848,
+          -240
+        ]
+      },
+      {
+        "parameters": {
+          "jsCode": "return [{ json: { response: $('Prepare').first().json.response } }];"
+        },
+        "id": "c953a474-4bda-41ea-a7ca-56a16772ba89",
+        "name": "Skip Output",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          640,
+          -32
+        ]
+      }
+    ],
+    "connections": {
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Prepare",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Prepare": {
+        "main": [
+          [
+            {
+              "node": "Skip?",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Skip?": {
+        "main": [
+          [
+            {
+              "node": "Skip Output",
+              "type": "main",
+              "index": 0
+            }
+          ],
+          [
+            {
+              "node": "Gmail",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "Gmail": {
+        "main": [
+          [
+            {
+              "node": "Success",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "templateCredsSetupCompleted": true,
+      "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+    }
+  }

@@ -166,4 +166,1239 @@ Ejemplos de respuestas:
 Detectaras y responderas siempre usando el mismo idioma con el que "Gaia Coworking member" esta utilizando para comunicarse contigo, en este caso: {{ $('DETECT USER LANG').item.json.message.content }}
 Asegúrate de activar la tool correspondiente a cada solicitud antes de realizar la tarea.
 En caso de información incompleta, responde solicitando los datos faltantes de manera educada y directa.
-La automatización debe garantizar que los datos se actualicen en tiempo real y que los correos se envíen sin errores.
+La automatización debe garantizar que los datos se actualicen en tiempo real y que los correos se envíen sin errores
+
+
+
+
+
+
+
+
+{
+  "nodes": [
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4c4cb6be-92a8-449a-9ca7-b94aa890b5f1",
+              "name": "mensaje",
+              "value": "={{ $json.text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        -2080
+      ],
+      "id": "13fcc0a0-3fb4-4094-832f-d80569bb34bd",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "# Mensaje del usuario:\n{{ $('INPUT NORMALIZATION').item.json.mensaje }}\n\n# Idioma actual del usuario:\n\"{{ $('DETECT USER LANG').item.json.message.content }}\"\n\n# Descripcion de la imagen extraida del proceso de analisis para peticiones del usuario relacionadas:\n\"{{ $('INPUT NORMALIZATION').item.json.image_text }}\"\n\n# Documento dado por el usuario para procesos de gestion documental relacionados:\n\"{{ $('INPUT NORMALIZATION').item.json.document_path }}\"\n\n# Fecha de hoy en formato ISO:\n{{ $now }}\n\n## Ten en cuenta estos datos para respuestas mas acertadas y con la fecha correcta siempre.",
+        "options": {
+          "systemMessage": "=# IDENTIDAD Y ROL\nTu nombre es *Gaia Coworking*. Siempre que te presentes por primera vez o te pregunten por tu identidad, debes decir tu nombre.\n\nEres un *asistente digital multilingüe altamente especializado* en la capacitación profesional para el equipo de *Gaia Coworking*, con enfoque en:\n- Servicio al cliente\n\nTu propósito es *enseñar, guiar y reforzar el conocimiento operativo y de atención al cliente** dentro del sector. Actúas como *mentor digital* para nuevos empleados y personal en formación.\n\n---\n\n# ÁMBITOS PRINCIPALES DE FORMACIÓN\nPuedes responder cualquier consulta relacionada con el trabajo diario, la operación, la atención al cliente o la formación de personal en hoteles, restaurantes o bares, incluyendo:\n\n- Uso de sistemas PMS (Property Management System) y gestión de reservas.\n- Atención al cliente multicanal (teléfono, e-mail, chat, redes sociales).\n- Fundamentos de revenue management y optimización de ocupación.\n- Buenas prácticas en calidad del servicio y satisfacción de huéspedes.\n- Montaje de habitaciones, mesas, salas y organización de eventos.\n- Procedimientos y protocolos internos en hoteles y restaurantes.\n- Preparación de espacios para el servicio (habitaciones, salas, comedores).\n- Organización de cenas de gala y eventos.\n- Formación en coctelería, cafetería, maridaje, tipos de vino, tipos de carne y etiqueta profesional.\n- Manejo y funcionamiento de equipos de cocina o limpieza (lavavajillas, hornos, planchas, etc.).\n- Técnicas de formación y entrenamiento del personal dentro del sector.\n- Cualquier otro aspecto práctico de la operación y servicio en entornos de hostelería, restauración o atención al cliente.\n\n---\n\n# EJEMPLOS DE COMPORTAMIENTO CORRECTO\n\n- *¿Qué cubiertos se deben usar en una cena de gala?*  \n  → [Explicación sobre protocolo y disposición de cubiertos].\n\n- *¿Cómo se prepara un negroni?*  \n  → [Explicación de ingredientes, técnica y presentación].\n\n- *¿Cuál es el corte ideal de carne para una hamburguesa jugosa?*  \n  → [Explicación sobre tipos de carne, porcentaje de grasa, etc.].\n\n- *¿Cómo funciona un lavavajillas industrial?*  \n  → [Explicación operativa, mantenimiento básico y uso correcto].\n\n- *¿Cuál es la historia del rock and roll?*  \n  → Lo siento, mi especialidad está centrada en...\n\n---\n\n# NORMAS DE COMUNICACIÓN\n- Siempre te dirigirás al usuario como *\"Gaia Coworking member\"*.\n- Detectarás y utilizarás automáticamente el idioma en que el equipo se comunique contigo, adaptando tu respuesta a ese idioma: {{ $('DETECT USER LANG').item.json.message.content }}.\n\n# Tarea\nTu objetivo es asistir a \"Gaia Coworking member\" en su día a día realizando las siguientes tareas:\n- Gestionar citas y programar reuniones.\n- Enviar recordatorios de las alertas pendientes.\n- Redactar y enviar correos electrónicos de forma precisa.\n- Gestionar y almacenar la documentacion proporcionada por \"Gaia Coworking member\"\n- Ayudar con el analisis de imagenes y videos para diferentes propositos.\n- Consulta de disponibilidad en tiempo real.  \n- Generación de informes de ocupación, ADR y RevPAR.  \n- Creación y modificación de tarifas y promociones.  \n- Envío de confirmaciones y recordatorios de check-in/check-out.  \n- Escalado de incidencias al equipo de operaciones o mantenimiento.\n\n\nPara cada tarea, debes activar una herramienta específica según la intención del usuario:\n- **Agendar una cita**: Activa la tool `'agendar_cita'`. Una vez termine esta herramienta, debes decirle que se agendó correctamente y usar un emoji que represente lo que se agendó.\n\n- **Consultar disponibilidad de un día**: Activa la tool `'ver_disponibilidad'`.\n\n- **Enviar un correo**: Activa la tool `'enviar_correo'`. Una vez termine la herramienta, debes indicarle que el correo se envió correctamente.\n\n- **Guardar documento**: Activa la tool `'procesar_documentos'`. Una vez termine la herramienta, debes indicarle que el documento se ha almacenado de forma correcta y que ya puede usarlo para futuras combersaciones.\n\n- **Trabajar con documento**: Activa la tool `'consultar_documentos'`. Una vez termine la herramienta, debes responder con la informacion devuelta por la consulta que habra sido procesada.\n\n- **Informacion de Hard Rock Cafe**: Activa la tool `'obtener_info_hardrock_cafe'`. Una vez termine la herramienta, debes responder con la informacion devuelta por la consulta que habra sido procesada.\n\n- **Informacion de Gaia Coworking**: Activa la tool `'obtener_info_hardrock_cafe'`. Una vez termine la herramienta, debes responder con la informacion devuelta por la consulta que habra sido procesada.\n\n# Detalles Específicos\n- Al verificar la disponibilidad de un día, debes responder con información clara, como \"Día Libre\", \"Reunión a las 3 PM\", etc.\n\n- Al procesar y guardar un documento, debes responder con información clara, como \"Documento nombre.pdf guardado\", \"Informacion lista para ser utilizada\", etc.\n\n- Si el usuario pide trabajar el analisis de imagenes pero la descripcion de la imagen que has recibido  esta vacia pediras de forma educada al usuario que te proporcione te proporcione el archivo de imagen de nuevo para poder trabajar con el.\n\n- Al consultar y obtener la informacion de la herramienta `'obtener_info_hardrock_cafe'` prestaras atencion a su contenido para poder responder a la pregunta del usuario usando la informacion exacta que corresponda.\n\n# Contexto\nEl usuario \"Gaia Coworking\" tiene la tarea de gestionar la operativa diaria de su Coworking de forma eficiente y ágil, por lo que es crucial que la información sobre reservas, solicitudes de los huéspedes y procedimientos de servicio se gestione con precisión y rapidez.\n\n\n# INFORMACIÓN DE OFERTAS Y PRECIOS DE GAIA COWORKING\n\n## CATEGORÍA 1: OFERTAS (Lugares Flexíveis, Lugares Fixos, Mesas Fixas, Part-time)\n\n### Lugar Flexível\n- **Passe Diário**: 14€ + IVA por dia - Um lugar disponível em qualquer mesa\n- **Passe Semanal**: 30€ + IVA por semana - Uso de qualquer lugar disponível durante 1 semana, mesa partilhada\n- **Pack 3 dias**: 55€ + IVA (pack) - Uso de qualquer lugar disponível em 3 dias à escolha, mesa partilhada\n- **Pack 5 dias**: 60€ + IVA (pack) - Uso de qualquer lugar disponível em 5 dias à escolha, mesa partilhada\n- **Pack 10 dias**: 110€ + IVA (pack) - Uso de qualquer lugar disponível em 10 dias à escolha, mesa partilhada\n\n### Lugar Fixo\n- **Mensal**: 150€ + IVA por mês - Cadeira fixa numa mesa partilhada, sempre reservada para a pessoa durante o mês\n- **Semanal**: 50€ + IVA por semana - Cadeira fixa numa mesa partilhada, sempre reservada para a pessoa durante uma semana\n\n### Mesa Fixa\n- **Mensal**: 170€ + IVA por mês - Mesa reservada exclusivamente para uma pessoa durante 1 mês, acesso à impressora e espaço comum\n- **Semanal**: 70€ + IVA por semana - Mesa reservada exclusivamente para uma pessoa durante 1 semana, acesso à impressora e espaço comum\n- **Full - time premium (24/7 + impressão + lockers)**: 180€ + IVA mensal - Mesa fixa com acesso 24/7, impressão incluída, cacifo/locker individual, café e água gratuitos\n\n### Part-time\n- **Pack 2 dias**: 85€ + IVA por dia - Acesso 2 dias por semana (09:00–19:00), mesa flexível, café e água incluídos\n- **Pack 10 dias**: 110€ + IVA mensal - Acesso a qualquer 10 dias no mês, mesa flexível, café e água incluídos; 8h mensais gratuitas na sala de reuniões mediante reserva\n\n## CATEGORÍA 2: ESCRITÓRIOS PRIVADOS\n\n### Escritório Privado - Mensal\n- **Pequeno 1**: 180€ + IVA por mês - 1 pessoa - Escritório privado para 1 pessoa, ideal para trabalhar sozinho, acesso a impressora e espaço comum\n- **Pequeno 2**: 180€ + IVA por mês - 1 pessoa - Escritório privado para 1 pessoa, ideal para trabalhar sozinho, acesso a impressora e espaço comum\n- **Médio**: 200€ + IVA por mês - 2 pessoas - Escritório privado para 1 pessoas, adequado para trabalhar sozinho ou receber 1 convidado, acesso a impressora e sala de reuniões\n- **Maior**: 230€ + IVA por mês - 2-3 pessoas - Escritório privado maior para 2–3 pessoas, para trabalhar ou receber convidados, acesso a impressora, sala de reuniões e espaço comum\n\n### Escritório Privado - Por Hora/Dia\n- **Pequeno (Hora)**: 10€ + IVA por hora - 1 pessoa - Escritório privado para realizar reunião online, trabalhar sozinho\n- **Pequeno (Dia)**: 35€ + IVA por dia - 1 pessoa - Escritório privado para realizar reunião online, trabalhar sozinho\n- **Médio (Hora)**: 12€ + IVA por hora - 1-2 pessoas - Escritório privado para 1–2 pessoas, reservado por dia, ideal para trabalhar ou receber alguém\n- **Médio (Dia)**: 55€ + IVA por dia - 1-2 pessoas - Escritório privado para 1–2 pessoas, reservado por dia, ideal para trabalhar ou receber alguém\n- **Grande (Hora)**: 15€ + IVA por hora - 2-3 pessoas - Escritório privado para 2–3 pessoas, reservado por dia, acesso a sala de reuniões e impressora\n- **Grande (Dia)**: 65€ + IVA por dia - 2-3 pessoas - Escritório privado para 2–3 pessoas, reservado por dia, acesso a sala de reuniões e impressora\n\n## CATEGORÍA 3: SALAS DE REUNIÕES\n\n### Sala de Reuniões Grande\n- **Hora**: 20€ + IVA por hora - até 8 pessoas - Sala grande para reuniões de equipa, apresentações ou workshops; equipada com monitor/projetor e mesa grande\n- **Meio-dia**: 65€ + IVA por meio-dia - até 8 pessoas - Reserva para manhã (9–13h) ou tarde (14–18h)\n- **Dia**: 110€ + IVA por dia - até 8 pessoas - Reserva da sala durante o dia inteiro, ideal para eventos, formações ou reuniões longas\n\n### Sala de Reuniões Pequena 1\n- **Hora**: 12€ + IVA por hora - 1-2 pessoas - Sala pequena ideal para chamadas, entrevistas ou reuniões rápidas\n- **Meio-dia**: 35€ + IVA por meio-dia - 1-2 pessoas - Reserva da manhã ou tarde\n- **Dia**: 60€ + IVA por dia - 1-2 pessoas - Uso exclusivo o dia todo\n\n### Sala de Reuniões Pequena 2\n- **Hora**: 12€ + IVA por hora - 1-2 pessoas - Sala pequena ideal para chamadas, entrevistas ou reuniões rápidas\n- **Meio-dia**: 35€ + IVA por meio-dia - 1-2 pessoas - Reserva da manhã ou tarde\n\n## INSTRUCCIONES PARA EL AGENTE SOBRE PRECIOS\n\nCuando un usuario pregunte sobre precios, ofertas, planos o disponibilidad:\n1. Utiliza EXACTAMENTE los precios y descripciones listados arriba\n2. Organiza la información por categorías (Ofertas, Escritórios, Salas de Reuniões)\n3. Siempre menciona que los precios incluyen IVA\n4. Si el usuario pregunta por una opción específica, proporciona todos los detalles de esa opción\n5. Si el usuario no está seguro qué necesita, haz preguntas para entender sus necesidades y recomendar la mejor opción\n6. Para reservas, indica que deben contactar a través del chat o WhatsApp\n\nEjemplos de respuestas:\n- \"Temos várias opções de lugares flexíveis. O Passe Diário custa 14€ + IVA por dia...\"\n- \"Para escritórios privados, temos opções desde 180€ + IVA mensal para 1 pessoa até 230€ + IVA para 2-3 pessoas...\"\n- \"As salas de reuniões grandes custam 20€ + IVA por hora para até 8 pessoas...\"\n\n# Notas\nDetectaras y responderas siempre usando el mismo idioma con el que \"Gaia Coworking member\" esta utilizando para comunicarse contigo, en este caso: {{ $('DETECT USER LANG').item.json.message.content }}\nAsegúrate de activar la tool correspondiente a cada solicitud antes de realizar la tarea.\nEn caso de información incompleta, responde solicitando los datos faltantes de manera educada y directa.\nLa automatización debe garantizar que los datos se actualicen en tiempo real y que los correos se envíen sin errores."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        1120,
+        -1104
+      ],
+      "id": "20e9b665-875e-4abc-9595-1648a439b943",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        512,
+        -608
+      ],
+      "id": "52cb2b5d-0dc6-496c-b06f-0098d8c012ce",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "SixHT5xqvTZTQgCk",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "agendar_cita",
+        "description": "Tu tarea es obtener, a partir de la conversación con el usuario, las siguientes variables:\n\nTítulo del evento: {{titulo}}\nTiempo inicio: {{tiempo_inicio}}\nTiempo fin: {{tiempo_fin}}\n\nPor ejemplo, si el usuario dice:\n\"Necesito que me agendes una cita para el 20 de enero de 2025 a las 15, me voy a juntar con Santiago un par de horas para hablar sobre un desarrollo de IA.\"\n\nTítulo = \"Charla sobre desarrollo de IA con Santiago\"\nTiempo inicio = 2025-01-20T15:00:00-03:00\nTiempo fin = 2025-01-20T17:00:00-03:00\n\n# Importante\nDebes incluir un emoji que represente la cita y el título debe ser conciso.\nLos tiempos de inicio y fin deben estar en formato ISO en la zona horaria de Madrid (+01:00).\nSiempre consulta con el usuario los datos antes de confirmar.\n",
+        "workflowId": {
+          "__rl": true,
+          "value": "wCO6chFLdqimWUjX",
+          "mode": "list",
+          "cachedResultName": "tool_agendar_cita"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"titulo\": \"\",\n  \"tiempo_inicio\":\"\",\n  \"tiempo_fin\":\"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2144,
+        -1168
+      ],
+      "id": "4e8173d0-68f5-4da3-8ef6-6c26c48f8eb0",
+      "name": "Agendar Cita"
+    },
+    {
+      "parameters": {
+        "name": "ver_disponibilidad",
+        "description": "Debes obtener la fecha y hora de inicio y de fin en el que el usuario quiere saber si está el horario libre.\n\nLas variables son las siguientes:\nTiempo inicio {{tiempo_inicio}}\nTiempo fin: {{tiempo_fin}}\n\n# Importante\nDebes obtener las fechas en formato ISO y timezone de Madrid, España (+1:00)",
+        "workflowId": {
+          "__rl": true,
+          "value": "b0ZDoow6PzO5BWJm",
+          "mode": "list",
+          "cachedResultName": "tool_ver_disponibilidad"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"tiempo_inicio\":\"\",\n  \"tiempo_fin\":\"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2368,
+        -1168
+      ],
+      "id": "eb5b151d-12a1-485a-bd17-d782cb6bdf05",
+      "name": "Ver disponinbilidad"
+    },
+    {
+      "parameters": {
+        "name": "enviar_correo",
+        "description": "Debes crear un mensaje de mail a partir de las indicaciones del usuario.\nAsegúrate de obtener los siguientes datos:\n1. Mail a enviar\n2. Asunto del mail\nTú tienes la tarea de crear un mail profesional y conciso según lo que te indique el usuario.\n\nDevuelve estas variables:\nDestinatario: {{destinatario}}\nAsunto: {{asunto}}\nMensaje: {{mensaje}}\n\n# Importante:\nEl mensaje debe estar en formato HTML y todo el mensaje debe tener letra en tamaño grande (preferiblemente h2).\nLos saludos iniciales y despedidas deben estar en un renglón solos.",
+        "workflowId": {
+          "__rl": true,
+          "value": "vbi8bQgVXlgVHvor",
+          "mode": "list",
+          "cachedResultName": "tool_enviar_correo"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"destinatario\":\"\",\n  \"asunto\":\"\",\n  \"mensaje\":\"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2576,
+        -1168
+      ],
+      "id": "cee9b543-e19b-4279-b2a9-d4b166780c3a",
+      "name": "Enviar Correo"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://generativelanguage.googleapis.com",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "googlePalmApi",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "model",
+              "value": "whisper-1"
+            },
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "language"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -352,
+        -2080
+      ],
+      "id": "c91a03a0-0b02-4d46-bca9-1a095408d446",
+      "name": "WHISPER",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "QsajyysZeIBMPt9C",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "messages": {
+          "values": [
+            {
+              "content": "=Detecta el idioma de este texto_usuario: {{ $('INPUT NORMALIZATION').item.json.mensaje }}"
+            },
+            {
+              "content": "=# ROL\nEres un especialista en detecta el idioma en el que esta escrito los textos que se te entregan.\nResponderas solo con el nombre del idioma detectado.\n\n# EJEMPLOS\n- texto_usuario: Hola mi nombre es mkl64\n- resultado: castellano\n\n- texto_usuario: Hi! my name is mkl64\n- resultado: English",
+              "role": "system"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        736,
+        -1104
+      ],
+      "id": "6d47c941-acf1-4cc7-841b-99ef5812862f",
+      "name": "DETECT USER LANG",
+      "credentials": {
+        "openAiApi": {
+          "id": "SixHT5xqvTZTQgCk",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "6e3dd72f-7ec6-49f2-b08e-828307c62d87",
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "audio/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ae6685c0-0a08-4489-ab8c-902bbb5698f8",
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "image/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "2ce93447-217f-4873-a768-af844893e319",
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "video/",
+                    "operator": {
+                      "type": "string",
+                      "operation": "contains"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "video"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e73a12e3-2320-43e7-bf24-47f7d8ab29db",
+                    "leftValue": "={{ $binary.data.mimeType }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "document"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -720,
+        -1856
+      ],
+      "id": "e53dccbe-3e95-41c7-bbd9-0c914977f291",
+      "name": "INTERACTION - MODES"
+    },
+    {
+      "parameters": {
+        "operation": "write",
+        "fileName": "={{ $('FILE-PATH-NAME').item.json.document_path }}{{ $binary.data.fileName }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.readWriteFile",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -1840
+      ],
+      "id": "423ad686-7db1-4e04-99de-82a7ff97f3f8",
+      "name": "Read/Write Files from Disk"
+    },
+    {
+      "parameters": {
+        "jsCode": "function processInput(data) {\n  // Extraer las claves del JSON en un array\n  var keys = Object.keys(data);\n\n  // Verificar si la clave \"document_path\" existe en el array de claves\n  if (!keys.includes(\"document_path\")) {\n    data.document_path = \"\";\n  }\n\n  // Verificar si la clave \"image_text\" existe en el array de claves\n  if (!keys.includes(\"image_text\")) {\n    data.image_text = \"\";\n  }\n\n  return data; // Devolvemos el objeto corregido\n}\n\n// Normalizar la entrada del usuario en n8n\nconst user_complete_input = processInput($input.all()[0].json);\nreturn user_complete_input;\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        464,
+        -1104
+      ],
+      "id": "99a9e875-1bfb-436b-b868-e6f810c287fe",
+      "name": "INPUT NORMALIZATION"
+    },
+    {
+      "parameters": {
+        "operation": "toBinary",
+        "sourceProperty": "file_data",
+        "options": {
+          "mimeType": "={{ $('Webhook').item.json.body.bs64_type }}"
+        }
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        -1200,
+        -1840
+      ],
+      "id": "5b823102-bd3d-498a-8b84-c55cda4f063c",
+      "name": "Convert to File"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e73a12e3-2320-43e7-bf24-47f7d8ab29db",
+                    "leftValue": "={{ $json.body.bs64_type }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "file_data"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ae6685c0-0a08-4489-ab8c-902bbb5698f8",
+                    "leftValue": "={{ $json.body.bs64_type }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not_file_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1824,
+        -912
+      ],
+      "id": "cea83501-5613-4580-8c1e-d12e633ebd07",
+      "name": "CHECK-TYPE"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "e73a12e3-2320-43e7-bf24-47f7d8ab29db",
+                    "leftValue": "={{ $json.body.bs64_file }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "notEmpty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "file_data"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 2
+                },
+                "conditions": [
+                  {
+                    "id": "ae6685c0-0a08-4489-ab8c-902bbb5698f8",
+                    "leftValue": "={{ $json.body.bs64_file }}",
+                    "rightValue": "application/pdf",
+                    "operator": {
+                      "type": "string",
+                      "operation": "empty",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "not_file_data"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.2,
+      "position": [
+        -1696,
+        -1824
+      ],
+      "id": "703f1730-734f-445a-a836-2ee3377df220",
+      "name": "CHECK-FILES"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7059e7eb-c469-433c-b76e-338116ca2ab7",
+              "name": "document_path",
+              "value": "={{ $json.fileName }}",
+              "type": "string"
+            },
+            {
+              "id": "ca379ca8-0b65-4e4f-945a-e4bd02805202",
+              "name": "mensaje",
+              "value": "{{ $('Webhook').item.json.body.question }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -240,
+        -1600
+      ],
+      "id": "5aaa70f5-e896-44fd-b887-54d4cdea99c2",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "mode": "raw",
+        "jsonOutput": "={\n  \"file_data\": \"{{ $json.body.bs64_file }}\",\n  \"document_path\": \"/home/node/n8n_files/test_\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1424,
+        -1840
+      ],
+      "id": "a645d512-ebbf-41a1-b7c6-bae01e11ac10",
+      "name": "FILE-PATH-NAME"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "49e2018a-fe36-4710-bed3-b411064e3a1b",
+              "name": "mensaje",
+              "value": "={{ $json.body.message }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -64,
+        -592
+      ],
+      "id": "8375a45e-311c-407b-b448-79bcea93285d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "return {\"answer\":$json.output}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1472,
+        -1104
+      ],
+      "id": "06a0d990-0a1a-4315-9e68-7c75df9d0244",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4c4cb6be-92a8-449a-9ca7-b94aa890b5f1",
+              "name": "image_text",
+              "value": "={{ $json.content }}",
+              "type": "string"
+            },
+            {
+              "id": "cecd00ea-f0cd-44f5-8fe5-489ee8102b2b",
+              "name": "mensaje",
+              "value": "={{ $('Webhook').item.json.body.question }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -112,
+        -1856
+      ],
+      "id": "7841ff29-0a59-4297-8dbe-b3f472a2a893",
+      "name": "Edit Fields3"
+    },
+    {
+      "parameters": {
+        "content": "# MODEL\n\n# MEMORY\n## **requires user id**",
+        "height": 200,
+        "width": 320,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        640,
+        -320
+      ],
+      "id": "d0df80bc-7572-4bb9-9dea-16ce0c4b672c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "# TEXT / AUDIO / IMAGES / VIDEO / DATA NORM",
+        "height": 80,
+        "width": 2440,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        -1504
+      ],
+      "id": "703ddd8e-5eac-4532-affc-39029e4d39cb",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# MODEL FORN LANG\n\n# AGENTTIC MODEL WITH ACTIONS",
+        "width": 660,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        720,
+        -1328
+      ],
+      "id": "0bf83876-ba14-4833-a444-b007849ef96e",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# CALENDAR / MAIL",
+        "height": 80,
+        "width": 540,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2128,
+        -1008
+      ],
+      "id": "1a720441-9fb0-482c-81ca-d2cfdf9d8de2",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "text": "=Descripción de la imagen detallada en formato MD simple para que use el string de respuesta en mi automatizacion.",
+        "inputType": "base64",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 1.8,
+      "position": [
+        -352,
+        -1856
+      ],
+      "id": "f2403cbf-cf4b-4763-bb36-a86e79db1ec6",
+      "name": "GPT4-V",
+      "credentials": {
+        "openAiApi": {
+          "id": "SixHT5xqvTZTQgCk",
+          "name": "n8n free OpenAI API credits"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "e05bf1eb-8902-4711-beb1-136110b75941",
+        "responseMode": "lastNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -2128,
+        -720
+      ],
+      "id": "7001ada2-13ef-4dfd-affb-8816c25782b5",
+      "name": "Webhook1",
+      "webhookId": "e05bf1eb-8902-4711-beb1-136110b75941"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        736,
+        -608
+      ],
+      "id": "007472ca-df05-4bc5-8b92-f8a47bd4a7f2",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "Rm9Jc6KNvQMstpzQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "name": "verificar_disponibilidad",
+        "description": "Verifica la disponibilidad de espacios en Gaia Coworking para las fechas que el usuario quiere reservar.\n\nDebes obtener:\n- Tipo de producto: {{producto}} (puede ser: 'Mesas partilhadas', 'Lugar Fixo', 'Mesa Fixa', 'Part-time')\n- Fechas a consultar: {{fechas}} (array de fechas en formato YYYY-MM-DD)\n\nEjemplo de uso:\nSi el usuario dice: \"Quiero ver si hay disponibilidad para el 15 y 16 de enero en mesas compartidas\"\n\nProducto = \"Mesas partilhadas\"\nFechas = [\"2025-01-15\", \"2025-01-16\"]\n\n# Importante\n- Las fechas deben estar en formato ISO (YYYY-MM-DD)\n- No incluir fines de semana (sábado y domingo)\n- Verificar que las fechas sean futuras",
+        "workflowId": {
+          "__rl": true,
+          "value": "WORKFLOW_VERIFICAR_DISPONIBILIDAD_ID",
+          "mode": "list",
+          "cachedResultName": "tool_verificar_disponibilidad"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"producto\": \"Mesas partilhadas\",\n  \"fechas\": [\"2025-01-15\", \"2025-01-16\"]\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1168,
+        -736
+      ],
+      "id": "b34d2218-b7a6-4567-a317-42783427d555",
+      "name": "Verificar Disponibilidad"
+    },
+    {
+      "parameters": {
+        "name": "crear_reserva",
+        "description": "Crea una reserva pendiente de pago en Gaia Coworking y genera el link de pago de Stripe.\n\nDebes obtener del usuario:\n- Tipo de producto: {{producto}} (Mesas partilhadas, Lugar Fixo, Mesa Fixa, Part-time)\n- Subtipo/Plan: {{subtipo}} (ej: 'Pack 3 dias', 'Passe Diário', 'Mensal', etc.)\n- Fechas seleccionadas: {{fechas}} (array de fechas en formato YYYY-MM-DD)\n- Email del cliente: {{email}}\n- Nombre del cliente: {{nombre}}\n- Precio en centavos: {{precio_centavos}} (ej: 5500 para 55€)\n\nEjemplo:\nSi el usuario dice: \"Quiero reservar el Pack de 3 días de mesas compartidas para el 15, 17 y 20 de enero. Mi email es juan@email.com\"\n\nProducto = \"Mesas partilhadas\"\nSubtipo = \"Pack 3 dias\"\nFechas = [\"2025-01-15\", \"2025-01-17\", \"2025-01-20\"]\nEmail = \"juan@email.com\"\nNombre = \"Juan\" (extraer del email o preguntar)\nPrecio_centavos = 5500\n\n# Precios de referencia (en centavos, sin IVA):\n## Mesas partilhadas:\n- Passe Diário: 1400 (14€)\n- Passe Semanal: 3000 (30€)\n- Pack 3 dias: 5500 (55€)\n- Pack 5 dias: 6000 (60€)\n- Pack 10 dias: 11000 (110€)\n\n## Lugar Fixo:\n- Mensal: 15000 (150€)\n- Semanal: 5000 (50€)\n\n## Mesa Fixa:\n- Mensal: 17000 (170€)\n- Semanal: 7000 (70€)\n- Full-time Premium: 18000 (180€)\n\n## Part-time:\n- Pack 2 dias/semana: 8500 (85€)\n- Pack 10 dias/mês: 11000 (110€)\n\n# Importante:\n- SIEMPRE verificar disponibilidad antes de crear la reserva\n- SIEMPRE pedir el email del cliente antes de crear la reserva\n- SIEMPRE confirmar los datos con el usuario antes de proceder\n- El precio debe incluir IVA (23%): precio_final = precio_centavos * 1.23",
+        "workflowId": {
+          "__rl": true,
+          "value": "WORKFLOW_CREAR_RESERVA_ID",
+          "mode": "list",
+          "cachedResultName": "tool_crear_reserva"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"producto\": \"Mesas partilhadas\",\n  \"subtipo\": \"Pack 3 dias\",\n  \"fechas\": [\"2025-01-15\", \"2025-01-17\", \"2025-01-20\"],\n  \"email\": \"cliente@email.com\",\n  \"nombre\": \"Juan García\",\n  \"precio_centavos\": 5500\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1392,
+        -736
+      ],
+      "id": "f1c709c9-bebc-40cf-9a7f-da1f8c9c6b6b",
+      "name": "Crear Reserva"
+    },
+    {
+      "parameters": {
+        "name": "enviar_correo_confirmacion",
+        "description": "Envía un correo de confirmación de reserva al cliente de Gaia Coworking.\n\nDebes obtener:\n- Email destinatario: {{destinatario}}\n- Nombre del cliente: {{nombre}}\n- Tipo de reserva: {{tipo_reserva}} (ej: 'Pack 3 dias de Mesas partilhadas')\n- Fechas reservadas: {{fechas}} (array de fechas)\n- Precio pagado: {{precio}} (en formato '55€')\n- ID de reserva: {{reserva_id}}\n\n# Importante:\n- El correo debe ser profesional y en portugués\n- Incluir información de ubicación de Gaia Coworking\n- Incluir horario de funcionamiento (09:00 - 19:00)\n- El mensaje debe estar en formato HTML con diseño atractivo\n- Usar los colores de la marca: azul (#2563eb) y morado (#9333ea)",
+        "workflowId": {
+          "__rl": true,
+          "value": "WORKFLOW_ENVIAR_CORREO_ID",
+          "mode": "list",
+          "cachedResultName": "tool_enviar_correo"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"destinatario\": \"cliente@email.com\",\n  \"nombre\": \"Juan García\",\n  \"tipo_reserva\": \"Pack 3 dias de Mesas partilhadas\",\n  \"fechas\": [\"2025-01-15\", \"2025-01-17\", \"2025-01-20\"],\n  \"precio\": \"67.65€\",\n  \"reserva_id\": \"abc123-def456\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1600,
+        -736
+      ],
+      "id": "bbd23d41-a262-4ddb-9424-1f5bb51a5d6c",
+      "name": "Enviar Correo Confirmación"
+    },
+    {
+      "parameters": {
+        "name": "consultar_precios",
+        "description": "Consulta y proporciona información sobre los precios y planes de Gaia Coworking.\n\nNo requiere parámetros de entrada, pero puede filtrar por:\n- Tipo de producto: {{producto}} (opcional: 'Mesas partilhadas', 'Lugar Fixo', 'Mesa Fixa', 'Part-time', 'Escritórios', 'Salas de Reuniões')\n\n# Información de precios a devolver:\n\n## Mesas Partilhadas (Hot Desks):\n- Passe Diário: 14€ + IVA (1 día)\n- Passe Semanal: 30€ + IVA (5 días úteis)\n- Pack 3 dias: 55€ + IVA (días a elegir)\n- Pack 5 dias: 60€ + IVA (días a elegir)\n- Pack 10 dias: 110€ + IVA (días a elegir)\n\n## Lugar Fixo (Cadeira reservada en mesa compartida):\n- Mensal: 150€ + IVA\n- Semanal: 50€ + IVA\n\n## Mesa Fixa (Mesa exclusiva):\n- Mensal: 170€ + IVA\n- Semanal: 70€ + IVA\n- Full-time Premium (24/7 + impressão + locker): 180€ + IVA\n\n## Part-time:\n- Pack 2 dias/semana: 85€ + IVA/mes\n- Pack 10 dias/mês: 110€ + IVA/mes\n\n## Escritórios Privados (aluguel mensual):\n- Pequeno (1 pessoa): 180€ + IVA\n- Médio (2-3 pessoas): 280€ + IVA\n- Grande (4-6 pessoas): 450€ + IVA\n\n## Salas de Reuniões:\n- Sala Grande (8 pessoas): 15€/hora, 50€/meio-dia, 80€/dia\n- Sala Pequena (4 pessoas): 10€/hora, 35€/meio-dia, 60€/dia\n\n# Importante:\n- Todos los precios son + IVA (23%)\n- Incluido: Wi-Fi rápido, café, agua, acceso a áreas comunes\n- Horario: 09:00 - 19:00 (Premium tiene acceso 24/7)",
+        "workflowId": {
+          "__rl": true,
+          "value": "WORKFLOW_CONSULTAR_PRECIOS_ID",
+          "mode": "list",
+          "cachedResultName": "tool_consultar_precios"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"producto\": \"Mesas partilhadas\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        1808,
+        -736
+      ],
+      "id": "6ece2f28-ed03-43a4-a4c2-9c70613d5b27",
+      "name": "Consultar Precios"
+    },
+    {
+      "parameters": {
+        "name": "completar_reserva",
+        "description": "Completa una reserva después de que el pago ha sido confirmado por Stripe.\n\nEsta tool es llamada automáticamente por el webhook de Stripe cuando un pago es exitoso.\n\nParámetros requeridos:\n- ID de reserva: {{reserva_id}}\n- ID de sesión de Stripe: {{stripe_session_id}}\n- ID de payment intent: {{stripe_payment_intent_id}}\n- Email del cliente: {{email}}\n- Nombre del cliente: {{nombre}}\n- Monto pagado: {{monto_pagado}} (en euros)\n\n# Importante:\n- Esta tool actualiza el estado de la reserva a 'confirmed'\n- Registra las fechas en la tabla de disponibilidad\n- Debe llamar a 'enviar_correo_confirmacion' después de completar",
+        "workflowId": {
+          "__rl": true,
+          "value": "WORKFLOW_COMPLETAR_RESERVA_ID",
+          "mode": "list",
+          "cachedResultName": "tool_completar_reserva"
+        },
+        "specifyInputSchema": true,
+        "jsonSchemaExample": "{\n  \"reserva_id\": \"abc123-def456\",\n  \"stripe_session_id\": \"cs_test_xxx\",\n  \"stripe_payment_intent_id\": \"pi_xxx\",\n  \"email\": \"cliente@email.com\",\n  \"nombre\": \"Juan García\",\n  \"monto_pagado\": 67.65\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2016,
+        -736
+      ],
+      "id": "bf517fb5-949c-4739-b350-cc1e0b306169",
+      "name": "Completar Reserva"
+    }
+  ],
+  "connections": {
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "INPUT NORMALIZATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agendar Cita": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Ver disponinbilidad": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "Enviar Correo": {
+      "ai_tool": [
+        []
+      ]
+    },
+    "WHISPER": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DETECT USER LANG": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INTERACTION - MODES": {
+      "main": [
+        [
+          {
+            "node": "WHISPER",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "GPT4-V",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read/Write Files from Disk": {
+      "main": [
+        [
+          {
+            "node": "INTERACTION - MODES",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "INPUT NORMALIZATION": {
+      "main": [
+        [
+          {
+            "node": "DETECT USER LANG",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Read/Write Files from Disk",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK-TYPE": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CHECK-FILES": {
+      "main": [
+        [
+          {
+            "node": "FILE-PATH-NAME",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "INPUT NORMALIZATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FILE-PATH-NAME": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "INPUT NORMALIZATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields3": {
+      "main": [
+        [
+          {
+            "node": "INPUT NORMALIZATION",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GPT4-V": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook1": {
+      "main": [
+        [
+          {
+            "node": "CHECK-TYPE",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar Disponibilidad": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Crear Reserva": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Correo Confirmación": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Precios": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Completar Reserva": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+  }
+}
+
+
+
+
+
+
+
+
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "09dedefa-7ce4-42be-920e-e0337f8bbbbf",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -96,
+        -16
+      ],
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "retryOnFail": false
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT * FROM v_precios_completos ORDER BY categoria, producto, precio_centavos;",
+        "options": {}
+      },
+      "id": "462ed332-ba47-46c9-bde4-fb9bc11dc52a",
+      "name": "Consultar Precios DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [
+        128,
+        -16
+      ],
+      "credentials": {
+        "postgres": {
+          "id": "Rm9Jc6KNvQMstpzQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [{ json: { mensaje: 'Não foram encontrados preços na base de dados.' } }];\n}\n\n// Agrupar por categoría y producto\nconst categorias = {};\n\nfor (const item of items) {\n  const cat = item.json.categoria;\n  const prod = item.json.producto;\n  \n  if (!categorias[cat]) {\n    categorias[cat] = {};\n  }\n  \n  if (!categorias[cat][prod]) {\n    categorias[cat][prod] = {\n      descripcion: item.json.producto_descripcion,\n      planes: []\n    };\n  }\n  \n  categorias[cat][prod].planes.push({\n    nombre: item.json.plan,\n    descripcion: item.json.plan_descripcion,\n    precio: item.json.precio_euros + '€',\n    precio_iva: item.json.precio_con_iva_euros + '€',\n    unidad: item.json.unidad,\n    capacidad: item.json.capacidad_personas\n  });\n}\n\n// Crear mensaje formateado\nlet mensaje = '📋 **PREÇOS GAIA COWORKING**\\n\\n';\n\nconst catNames = {\n  'ofertas': '🪑 OFERTAS (Mesas e Lugares)',\n  'escritorios': '🚪 ESCRITÓRIOS PRIVADOS',\n  'salas': '👥 SALAS DE REUNIÕES'\n};\n\nfor (const [cat, productos] of Object.entries(categorias)) {\n  mensaje += `### ${catNames[cat] || cat}\\n\\n`;\n  \n  for (const [prodNome, prodData] of Object.entries(productos)) {\n    mensaje += `**${prodNome}**\\n`;\n    if (prodData.descripcion) {\n      mensaje += `_${prodData.descripcion}_\\n`;\n    }\n    mensaje += '\\n';\n    \n    for (const plan of prodData.planes) {\n      mensaje += `• ${plan.nombre}: **${plan.precio} + IVA** (${plan.precio_iva} total)`;\n      if (plan.unidad) mensaje += ` / ${plan.unidad}`;\n      if (plan.capacidad) mensaje += ` - ${plan.capacidad}`;\n      mensaje += '\\n';\n    }\n    mensaje += '\\n';\n  }\n}\n\nmensaje += '---\\n';\nmensaje += '✅ _Todos os preços incluem: Wi-Fi, café, água e acesso às áreas comuns_\\n';\nmensaje += '🕐 _Horário: 09:00 - 19:00 (Premium tem acesso 24/7)_\\n\\n';\nmensaje += '💬 **Quer fazer uma reserva? Diz-me o produto, as datas e o teu email!**';\n\nreturn [{ json: { precios: categorias, mensaje: mensaje } }];"
+      },
+      "id": "b0e9b46e-2bab-4e52-bdaf-570450d1c3a9",
+      "name": "Formatear Precios",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        336,
+        -16
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Consultar Precios DB",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Consultar Precios DB": {
+      "main": [
+        [
+          {
+            "node": "Formatear Precios",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+  }
+}

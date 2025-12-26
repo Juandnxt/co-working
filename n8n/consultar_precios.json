@@ -1,0 +1,82 @@
+{
+    "nodes": [
+      {
+        "parameters": {
+          "jsCode": "const items = $input.all();\n\nif (items.length === 0) {\n  return [{ json: { mensaje: 'Não foram encontrados preços na base de dados.' } }];\n}\n\n// Agrupar por categoría y producto\nconst categorias = {};\n\nfor (const item of items) {\n  const cat = item.json.categoria;\n  const prod = item.json.producto;\n  \n  if (!categorias[cat]) {\n    categorias[cat] = {};\n  }\n  \n  if (!categorias[cat][prod]) {\n    categorias[cat][prod] = {\n      descripcion: item.json.producto_descripcion,\n      planes: []\n    };\n  }\n  \n  categorias[cat][prod].planes.push({\n    nombre: item.json.plan,\n    descripcion: item.json.plan_descripcion,\n    precio: item.json.precio_euros + '€',\n    precio_iva: item.json.precio_con_iva_euros + '€',\n    unidad: item.json.unidad,\n    capacidad: item.json.capacidad_personas\n  });\n}\n\n// Crear mensaje formateado\nlet mensaje = '📋 **PREÇOS GAIA COWORKING**\\n\\n';\n\nconst catNames = {\n  'ofertas': '🪑 OFERTAS (Mesas e Lugares)',\n  'escritorios': '🚪 ESCRITÓRIOS PRIVADOS',\n  'salas': '👥 SALAS DE REUNIÕES'\n};\n\nfor (const [cat, productos] of Object.entries(categorias)) {\n  mensaje += `### ${catNames[cat] || cat}\\n\\n`;\n  \n  for (const [prodNome, prodData] of Object.entries(productos)) {\n    mensaje += `**${prodNome}**\\n`;\n    if (prodData.descripcion) {\n      mensaje += `_${prodData.descripcion}_\\n`;\n    }\n    mensaje += '\\n';\n    \n    for (const plan of prodData.planes) {\n      mensaje += `• ${plan.nombre}: **${plan.precio} + IVA** (${plan.precio_iva} total)`;\n      if (plan.unidad) mensaje += ` / ${plan.unidad}`;\n      if (plan.capacidad) mensaje += ` - ${plan.capacidad}`;\n      mensaje += '\\n';\n    }\n    mensaje += '\\n';\n  }\n}\n\nmensaje += '---\\n';\nmensaje += '✅ _Todos os preços incluem: Wi-Fi, café, água e acesso às áreas comuns_\\n';\nmensaje += '🕐 _Horário: 09:00 - 19:00 (Premium tem acesso 24/7)_\\n\\n';\nmensaje += '💬 **Quer fazer uma reserva? Diz-me o produto, as datas e o teu email!**';\n\nreturn [{ json: { precios: categorias, mensaje: mensaje } }];"
+        },
+        "id": "b0e9b46e-2bab-4e52-bdaf-570450d1c3a9",
+        "name": "Formatear Precios",
+        "type": "n8n-nodes-base.code",
+        "typeVersion": 2,
+        "position": [
+          336,
+          -16
+        ]
+      },
+      {
+        "parameters": {
+          "operation": "executeQuery",
+          "query": "SELECT * FROM v_precios_completos ORDER BY categoria, producto, precio_centavos;",
+          "options": {}
+        },
+        "id": "462ed332-ba47-46c9-bde4-fb9bc11dc52a",
+        "name": "Consultar Precios DB",
+        "type": "n8n-nodes-base.postgres",
+        "typeVersion": 2.5,
+        "position": [
+          128,
+          -16
+        ],
+        "credentials": {
+          "postgres": {
+            "id": "Rm9Jc6KNvQMstpzQ",
+            "name": "Postgres account"
+          }
+        }
+      },
+      {
+        "parameters": {
+          "inputSource": "passthrough"
+        },
+        "id": "09dedefa-7ce4-42be-920e-e0337f8bbbbf",
+        "name": "When Executed by Another Workflow",
+        "type": "n8n-nodes-base.executeWorkflowTrigger",
+        "typeVersion": 1.1,
+        "position": [
+          -96,
+          -16
+        ],
+        "alwaysOutputData": false,
+        "executeOnce": false,
+        "retryOnFail": false
+      }
+    ],
+    "connections": {
+      "Consultar Precios DB": {
+        "main": [
+          [
+            {
+              "node": "Formatear Precios",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      },
+      "When Executed by Another Workflow": {
+        "main": [
+          [
+            {
+              "node": "Consultar Precios DB",
+              "type": "main",
+              "index": 0
+            }
+          ]
+        ]
+      }
+    },
+    "pinData": {},
+    "meta": {
+      "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+    }
+  }

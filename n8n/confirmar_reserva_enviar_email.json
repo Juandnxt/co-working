@@ -1,0 +1,186 @@
+{
+  "name": "confirmar_reserva_enviar_email",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "confirmar-reserva-email",
+        "responseMode": "lastNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "id": "webhook-confirmar",
+      "name": "Webhook Confirmar",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 100],
+      "webhookId": "confirmar-reserva-email"
+    },
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "trigger-subworkflow",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nlet data = input.body || input;\n\n// Manejar diferentes estructuras\nif (data.query) data = { ...data, ...data.query };\nif (data.json) data = { ...data, ...data.json };\n\nconst sessionId = data.stripe_session_id || data.sessionId || data.session_id || '';\nconst bookingId = data.booking_id || data.bookingId || data.reserva_id || '';\n\nconsole.log('=== CONFIRMAR RESERVA ===' );\nconsole.log('Session ID:', sessionId);\nconsole.log('Booking ID:', bookingId);\n\nif (!sessionId && !bookingId) {\n  return [{ json: { success: false, error: 'Necesito sessionId o bookingId' } }];\n}\n\nreturn [{ json: { sessionId, bookingId, valid: true } }];"
+      },
+      "id": "validar-input",
+      "name": "Validar Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [480, 200]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+          "conditions": [{ "id": "check-valid", "leftValue": "={{ $json.valid }}", "rightValue": true, "operator": { "type": "boolean", "operation": "equals" } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "es-valido",
+      "name": "Es Válido?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [720, 200]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "=UPDATE reservas \nSET estado = 'confirmed'\nWHERE (stripe_session_id = '{{ $json.sessionId }}' OR id::text LIKE '%{{ $json.bookingId }}%')\n  AND estado = 'pending'\nRETURNING id, producto_nombre, plan_nombre, cliente_email, cliente_nombre, fechas_seleccionadas, precio_total_centavos;",
+        "options": {}
+      },
+      "id": "confirmar-reserva",
+      "name": "Confirmar Reserva DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [960, 100],
+      "credentials": {
+        "postgres": {
+          "id": "Rm9Jc6KNvQMstpzQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true, "leftValue": "", "typeValidation": "strict", "version": 2 },
+          "conditions": [{ "id": "check-found", "leftValue": "={{ $json.id }}", "rightValue": "", "operator": { "type": "string", "operation": "notEmpty", "singleValue": true } }],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "reserva-encontrada",
+      "name": "Reserva Encontrada?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [1200, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const reserva = $input.first().json;\n\nlet fechasStr = 'Data não especificada';\nif (reserva.fechas_seleccionadas && reserva.fechas_seleccionadas.length > 0) {\n  const fechas = reserva.fechas_seleccionadas.map(f => {\n    const d = new Date(f + 'T12:00:00');\n    return d.toLocaleDateString('pt-PT', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });\n  });\n  fechasStr = fechas.join(', ');\n}\n\nconst precio = ((reserva.precio_total_centavos || 0) / 100).toFixed(2);\n\nconst emailHtml = `<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"utf-8\">\n  <style>\n    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); padding: 30px; text-align: center; border-radius: 12px 12px 0 0; }\n    .header h1 { color: white; margin: 0; font-size: 24px; }\n    .content { padding: 30px; background: #f9fafb; border-radius: 0 0 12px 12px; }\n    .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }\n    .detail-row { padding: 12px 0; border-bottom: 1px solid #e5e7eb; }\n    .detail-row:last-child { border-bottom: none; }\n    .label { color: #6b7280; font-size: 14px; }\n    .value { font-weight: 600; color: #111827; margin-top: 4px; }\n    .total { background: #ecfdf5; padding: 16px; border-radius: 8px; text-align: center; margin-top: 20px; }\n    .total-amount { font-size: 28px; font-weight: 700; color: #059669; }\n    .btn { display: inline-block; background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%); color: white; padding: 14px 28px; border-radius: 8px; text-decoration: none; font-weight: 600; }\n  </style>\n</head>\n<body>\n  <div class=\"header\">\n    <h1>✅ Reserva Confirmada!</h1>\n  </div>\n  <div class=\"content\">\n    <p>Olá <strong>${reserva.cliente_nombre || 'Cliente'}</strong>,</p>\n    <p>O teu pagamento foi processado com sucesso!</p>\n    \n    <div class=\"card\">\n      <div class=\"detail-row\">\n        <div class=\"label\">📦 Produto</div>\n        <div class=\"value\">${reserva.producto_nombre}</div>\n      </div>\n      <div class=\"detail-row\">\n        <div class=\"label\">📋 Plano</div>\n        <div class=\"value\">${reserva.plan_nombre}</div>\n      </div>\n      <div class=\"detail-row\">\n        <div class=\"label\">📅 Data(s)</div>\n        <div class=\"value\">${fechasStr}</div>\n      </div>\n      <div class=\"total\">\n        <div style=\"color: #6b7280; font-size: 14px;\">Total pago</div>\n        <div class=\"total-amount\">${precio}€</div>\n      </div>\n    </div>\n    \n    <p>📍 <strong>Morada:</strong> Gaia Coworking, Vila Nova de Gaia</p>\n    <p>🕐 <strong>Horário:</strong> Segunda a Sexta, 09:00 - 19:00</p>\n    \n    <p style=\"text-align: center; margin-top: 30px;\">\n      <a href=\"https://gaiacoworking.pt\" class=\"btn\">Visitar Website</a>\n    </p>\n    \n    <p style=\"margin-top: 30px;\">Até breve! 👋<br><strong>Equipa Gaia Coworking</strong></p>\n  </div>\n</body>\n</html>`;\n\nreturn [{ json: {\n  to: reserva.cliente_email,\n  subject: `✅ Reserva Confirmada - ${reserva.producto_nombre}`,\n  html: emailHtml,\n  reserva: reserva\n}}];"
+      },
+      "id": "preparar-email",
+      "name": "Preparar Email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 0]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "html",
+        "message": "={{ $json.html }}",
+        "options": { "senderName": "Gaia Coworking" }
+      },
+      "id": "enviar-email",
+      "name": "Enviar Email",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [1680, 0],
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "YOUR_GMAIL_CREDENTIAL_ID",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const reserva = $('Preparar Email').first().json.reserva;\nreturn [{ json: { \n  success: true,\n  message: 'Reserva confirmada y email enviado',\n  email: reserva.cliente_email,\n  reserva_id: reserva.id\n}}];"
+      },
+      "id": "respuesta-exito",
+      "name": "Respuesta Éxito",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1920, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: false, message: 'Reserva no encontrada o ya confirmada' } }];"
+      },
+      "id": "no-encontrada",
+      "name": "No Encontrada",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1440, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { success: false, message: 'Datos inválidos' } }];"
+      },
+      "id": "error-validacion",
+      "name": "Error Validación",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [960, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Confirmar": {
+      "main": [[{ "node": "Validar Input", "type": "main", "index": 0 }]]
+    },
+    "When Executed by Another Workflow": {
+      "main": [[{ "node": "Validar Input", "type": "main", "index": 0 }]]
+    },
+    "Validar Input": {
+      "main": [[{ "node": "Es Válido?", "type": "main", "index": 0 }]]
+    },
+    "Es Válido?": {
+      "main": [
+        [{ "node": "Confirmar Reserva DB", "type": "main", "index": 0 }],
+        [{ "node": "Error Validación", "type": "main", "index": 0 }]
+      ]
+    },
+    "Confirmar Reserva DB": {
+      "main": [[{ "node": "Reserva Encontrada?", "type": "main", "index": 0 }]]
+    },
+    "Reserva Encontrada?": {
+      "main": [
+        [{ "node": "Preparar Email", "type": "main", "index": 0 }],
+        [{ "node": "No Encontrada", "type": "main", "index": 0 }]
+      ]
+    },
+    "Preparar Email": {
+      "main": [[{ "node": "Enviar Email", "type": "main", "index": 0 }]]
+    },
+    "Enviar Email": {
+      "main": [[{ "node": "Respuesta Éxito", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+  }
+}

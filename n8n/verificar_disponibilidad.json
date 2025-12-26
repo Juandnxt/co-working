@@ -1,0 +1,41 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "55488514-bd8c-4bc4-923a-1d0a27d664b7",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-192, 16]
+    },
+    {
+      "parameters": {
+        "jsCode": "// ====== DEBUG ======\nconst allData = $input.all();\nconsole.log('\\n========================================');\nconsole.log('VERIFICAR_DISPONIBILIDAD - DATOS RECIBIDOS:');\nconsole.log('========================================');\nconsole.log(JSON.stringify(allData, null, 2));\n\nconst firstItem = $input.first();\nlet input = firstItem?.json || firstItem || {};\n\n// Si viene anidado\nif (input.json) input = input.json;\nif (input.input) input = { ...input, ...input.input };\n\nconsole.log('--- INPUT PROCESADO ---');\nconsole.log(JSON.stringify(input, null, 2));\n\n// Extraer datos\nconst producto = input.producto || input.product || input.produto || '';\nlet fechas = input.fechas || input.dates || input.datas || input.fecha || input.date || [];\n\n// Normalizar fechas\nif (typeof fechas === 'string') {\n  try {\n    fechas = JSON.parse(fechas);\n  } catch {\n    const match = fechas.match(/(\\d{4}-\\d{2}-\\d{2})/);\n    fechas = match ? [match[1]] : [fechas];\n  }\n}\nif (!Array.isArray(fechas)) fechas = fechas ? [fechas] : [];\n\n// Limpiar fechas\nconst fechasLimpias = fechas\n  .map(f => {\n    if (!f) return null;\n    const fStr = String(f).trim();\n    if (/^\\d{4}-\\d{2}-\\d{2}$/.test(fStr)) return fStr;\n    const match = fStr.match(/(\\d{4}-\\d{2}-\\d{2})/);\n    if (match) return match[1];\n    try {\n      const d = new Date(fStr);\n      if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];\n    } catch {}\n    return null;\n  })\n  .filter(f => f !== null);\n\nconsole.log('--- CAMPOS EXTRAÍDOS ---');\nconsole.log('producto:', producto);\nconsole.log('fechasLimpias:', fechasLimpias);\n\n// Si no hay producto o fechas, pedir\nif (!producto || fechasLimpias.length === 0) {\n  const missing = [];\n  if (!producto) missing.push('produto');\n  if (fechasLimpias.length === 0) missing.push('data (formato AAAA-MM-DD)');\n  \n  return [{ json: { \n    response: `Para verificar a disponibilidade, preciso que me indiques: **${missing.join(' e ')}**.\\n\\nPor exemplo: \"Mesas partilhadas, 2025-12-30\"`\n  } }];\n}\n\n// Formatear fechas para mostrar\nconst fechasStr = fechasLimpias.map(f => {\n  try {\n    const d = new Date(f + 'T12:00:00');\n    return d.toLocaleDateString('pt-PT', { day: 'numeric', month: 'short' });\n  } catch {\n    return f;\n  }\n}).join(', ');\n\nconst msg = `✅ As datas (**${fechasStr}**) estão disponíveis para **${producto}**!\\n\\n📝 Para continuar com a reserva, preciso do teu:\\n• 📧 **Email**\\n• 👤 **Nome completo**\\n\\nPor favor, envia estes dados.`;\n\nreturn [{ json: { \n  response: msg,\n  producto: producto,\n  fechas: fechasLimpias,\n  disponible: true\n} }];"
+      },
+      "id": "158af541-49a1-4851-bd8b-dff25e0bcb48",
+      "name": "Check",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [32, 0]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+  }
+}

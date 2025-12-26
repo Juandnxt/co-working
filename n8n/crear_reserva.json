@@ -1,0 +1,297 @@
+{
+  "name": "crear_reserva",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "id": "trigger-subworkflow",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [-400, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Obtener datos del AI Agent\nconst allData = $input.all();\nconsole.log('CREAR_RESERVA INPUT:', JSON.stringify(allData, null, 2));\n\nconst firstItem = $input.first();\nlet input = firstItem?.json || firstItem || {};\n\n// Si viene anidado en diferentes formatos\nif (input.json) input = { ...input, ...input.json };\nif (input.input) input = { ...input, ...input.input };\nif (input.query) input = { ...input, ...input.query };\n\nconsole.log('Input aplanado:', JSON.stringify(input, null, 2));\n\n// Extraer campos\nconst producto = input.producto || input.product || input.produto || 'Mesas partilhadas';\nconst subtipo = input.subtipo || input.subtype || input.plano || input.plan || 'Passe Diário';\nconst email = input.email || input.correo || '';\nconst nombre = input.nombre || input.name || input.nome || '';\nlet fechas = input.fechas || input.dates || input.datas || input.fecha || input.date || [];\nlet precioCentavos = input.precio_centavos || input.price_cents || input.preco_centavos || 0;\n\n// Normalizar fechas\nif (typeof fechas === 'string') {\n  try { fechas = JSON.parse(fechas); } catch { fechas = [fechas]; }\n}\nif (!Array.isArray(fechas)) fechas = fechas ? [fechas] : [];\n\n// Limpiar fechas a formato YYYY-MM-DD\nconst fechasLimpias = fechas.map(f => {\n  if (!f) return null;\n  const str = String(f).trim();\n  if (/^\\d{4}-\\d{2}-\\d{2}$/.test(str)) return str;\n  const match = str.match(/(\\d{4}-\\d{2}-\\d{2})/);\n  if (match) return match[1];\n  try {\n    const d = new Date(str);\n    if (!isNaN(d.getTime())) return d.toISOString().split('T')[0];\n  } catch {}\n  return null;\n}).filter(f => f !== null);\n\n// Validar\nconst missing = [];\nif (!email || !email.includes('@')) missing.push('email');\nif (!nombre || nombre.length < 2) missing.push('nome');\nif (fechasLimpias.length === 0) missing.push('data');\n\nif (missing.length > 0) {\n  return [{ json: { \n    error: true,\n    response: `❌ Para criar a reserva, preciso: ${missing.join(', ')}.`\n  }}];\n}\n\n// TABLA COMPLETA DE PRECIOS EN CENTAVOS (de la DB)\nconst PRECIOS_DB = {\n  // Mesas partilhadas\n  'mesas partilhadas|passe diário': 1400,\n  'mesas partilhadas|passe semanal': 3000,\n  'mesas partilhadas|pack 3 dias': 5500,\n  'mesas partilhadas|pack 5 dias': 6000,\n  'mesas partilhadas|pack 10 dias': 11000,\n  // Lugar Fixo\n  'lugar fixo|semanal': 5000,\n  'lugar fixo|mensal': 15000,\n  // Mesa Fixa\n  'mesa fixa|semanal': 7000,\n  'mesa fixa|mensal': 17000,\n  'mesa fixa|full-time premium': 18000,\n  // Part-time\n  'part-time|pack 2 dias/semana': 8500,\n  'part-time|pack 10 dias/mês': 11000,\n  // Escritórios\n  'escritório privado grande|por hora': 1500,\n  'escritório privado grande|por dia': 6500,\n  'escritório privado grande|mensal': 23000,\n  'escritório privado médio|por hora': 1200,\n  'escritório privado médio|por dia': 5500,\n  'escritório privado médio|mensal': 20000,\n  'escritório privado pequeno 1|por hora': 1000,\n  'escritório privado pequeno 1|por dia': 3500,\n  'escritório privado pequeno 1|mensal': 18000,\n  'escritório privado pequeno 2|por hora': 1000,\n  'escritório privado pequeno 2|por dia': 3500,\n  'escritório privado pequeno 2|mensal': 18000,\n  // Salas\n  'sala de reuniões grande|por hora': 2000,\n  'sala de reuniões grande|meio-dia': 6500,\n  'sala de reuniões grande|dia completo': 11000,\n  'sala de reuniões pequena 1|por hora': 1200,\n  'sala de reuniões pequena 1|meio-dia': 3500,\n  'sala de reuniões pequena 1|dia completo': 6000,\n  'sala de reuniões pequena 2|por hora': 1200,\n  'sala de reuniões pequena 2|meio-dia': 3500,\n};\n\n// Buscar precio en la tabla\nconst prodLower = producto.toLowerCase().trim();\nconst subLower = subtipo.toLowerCase().trim();\nconst key = `${prodLower}|${subLower}`;\n\nif (PRECIOS_DB[key]) {\n  precioCentavos = PRECIOS_DB[key];\n} else {\n  // Fallback: buscar por subtipo parcial\n  for (const [k, v] of Object.entries(PRECIOS_DB)) {\n    if (k.includes(subLower) || subLower.includes(k.split('|')[1])) {\n      precioCentavos = v;\n      break;\n    }\n  }\n}\n\n// Si aún no hay precio, usar default\nif (!precioCentavos || precioCentavos === 0) precioCentavos = 1400;\n\nconsole.log('Precio final:', precioCentavos, 'para', key);\n\nreturn [{ json: {\n  producto: producto.trim(),\n  subtipo: subtipo.trim(),\n  fechas: fechasLimpias,\n  fechas_pg: `{${fechasLimpias.join(',')}}`,\n  email: email.toLowerCase().trim(),\n  nombre: nombre.trim(),\n  precio_centavos: parseInt(precioCentavos),\n  error: false\n}}];"
+      },
+      "id": "validar-input",
+      "name": "Validar Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-176, 0]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-error",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "tiene-error",
+      "name": "Tiene Error?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [48, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $input.first().json;\nconst precio = data.precio_centavos;\n\nconst query = `SELECT \n  p.id as producto_id,\n  p.nombre as producto_nombre,\n  pl.id as plan_id,\n  pl.nombre as plan_nombre,\n  pl.precio_centavos,\n  pl.precio_con_iva_centavos\nFROM productos p\nJOIN planes pl ON pl.producto_id = p.id\nWHERE p.activo = true \n  AND pl.activo = true\n  AND pl.precio_centavos = ${precio}\nLIMIT 1;`;\n\nconsole.log('Query generada:', query);\n\nreturn [{ json: { ...data, query } }];"
+      },
+      "id": "preparar-query",
+      "name": "Preparar Query",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [272, -112]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.query }}",
+        "options": {}
+      },
+      "id": "buscar-producto-plan",
+      "name": "Buscar Producto y Plan",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [496, -112],
+      "credentials": {
+        "postgres": {
+          "id": "Rm9Jc6KNvQMstpzQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "check-found",
+              "leftValue": "={{ $json.producto_id }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "encontrado",
+      "name": "Encontrado?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [720, -112]
+    },
+    {
+      "parameters": {
+        "jsCode": "const plan = $input.first().json;\nconst data = $('Preparar Query').first().json;\n\nconst query = `INSERT INTO reservas (\n  producto_id, plan_id, producto_nombre, plan_nombre,\n  fechas_seleccionadas, precio_base_centavos, precio_total_centavos,\n  cliente_email, cliente_nombre, estado, expires_at\n) VALUES (\n  '${plan.producto_id}'::uuid,\n  '${plan.plan_id}'::uuid,\n  '${plan.producto_nombre}',\n  '${plan.plan_nombre}',\n  '${data.fechas_pg}'::date[],\n  ${plan.precio_centavos},\n  ${plan.precio_con_iva_centavos || plan.precio_centavos},\n  '${data.email}',\n  '${data.nombre}',\n  'pending',\n  NOW() + INTERVAL '30 minutes'\n)\nRETURNING id, producto_nombre, plan_nombre, precio_total_centavos, cliente_email, cliente_nombre;`;\n\nreturn [{ json: { ...plan, ...data, insertQuery: query } }];"
+      },
+      "id": "preparar-insert",
+      "name": "Preparar Insert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [944, -224]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.insertQuery }}",
+        "options": {}
+      },
+      "id": "crear-reserva-db",
+      "name": "Crear Reserva DB",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [1168, -224],
+      "credentials": {
+        "postgres": {
+          "id": "Rm9Jc6KNvQMstpzQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const reserva = $input.first().json;\n\n// Stripe requiere form-urlencoded con estructura específica\nconst stripeParams = {\n  'mode': 'payment',\n  'success_url': 'http://localhost:5000/pt/success?session_id={CHECKOUT_SESSION_ID}',\n  'cancel_url': 'http://localhost:5000/pt/precos',\n  'customer_email': reserva.cliente_email,\n  'metadata[bookingId]': reserva.id,\n  'metadata[producto]': reserva.producto_nombre,\n  'metadata[plan]': reserva.plan_nombre,\n  'line_items[0][price_data][currency]': 'eur',\n  'line_items[0][price_data][unit_amount]': reserva.precio_total_centavos,\n  'line_items[0][price_data][product_data][name]': `${reserva.producto_nombre} - ${reserva.plan_nombre}`,\n  'line_items[0][price_data][product_data][description]': 'Reserva Gaia Coworking',\n  'line_items[0][quantity]': 1\n};\n\nreturn [{ json: { ...reserva, stripeParams } }];"
+      },
+      "id": "preparar-stripe",
+      "name": "Preparar Stripe",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1392, -224]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.stripe.com/v1/checkout/sessions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "stripeApi",
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            { "name": "mode", "value": "={{ $json.stripeParams.mode }}" },
+            { "name": "success_url", "value": "={{ $json.stripeParams.success_url }}" },
+            { "name": "cancel_url", "value": "={{ $json.stripeParams.cancel_url }}" },
+            { "name": "customer_email", "value": "={{ $json.stripeParams.customer_email }}" },
+            { "name": "metadata[bookingId]", "value": "={{ $json.stripeParams['metadata[bookingId]'] }}" },
+            { "name": "metadata[producto]", "value": "={{ $json.stripeParams['metadata[producto]'] }}" },
+            { "name": "metadata[plan]", "value": "={{ $json.stripeParams['metadata[plan]'] }}" },
+            { "name": "line_items[0][price_data][currency]", "value": "={{ $json.stripeParams['line_items[0][price_data][currency]'] }}" },
+            { "name": "line_items[0][price_data][unit_amount]", "value": "={{ $json.stripeParams['line_items[0][price_data][unit_amount]'] }}" },
+            { "name": "line_items[0][price_data][product_data][name]", "value": "={{ $json.stripeParams['line_items[0][price_data][product_data][name]'] }}" },
+            { "name": "line_items[0][price_data][product_data][description]", "value": "={{ $json.stripeParams['line_items[0][price_data][product_data][description]'] }}" },
+            { "name": "line_items[0][quantity]", "value": "={{ $json.stripeParams['line_items[0][quantity]'] }}" }
+          ]
+        },
+        "options": {}
+      },
+      "id": "stripe-checkout",
+      "name": "Stripe Checkout",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1616, -224],
+      "credentials": {
+        "stripeApi": {
+          "id": "YOUR_STRIPE_CREDENTIAL_ID",
+          "name": "Stripe account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const stripe = $input.first().json;\nconst reserva = $('Crear Reserva DB').first().json;\n\nconst updateQuery = `UPDATE reservas SET stripe_session_id = '${stripe.id}', stripe_checkout_url = '${stripe.url}' WHERE id = '${reserva.id}'::uuid;`;\n\nreturn [{ json: { ...stripe, reserva, updateQuery } }];"
+      },
+      "id": "preparar-update",
+      "name": "Preparar Update",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1840, -224]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "={{ $json.updateQuery }}",
+        "options": {}
+      },
+      "id": "guardar-stripe",
+      "name": "Guardar Stripe ID",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [2064, -224],
+      "credentials": {
+        "postgres": {
+          "id": "Rm9Jc6KNvQMstpzQ",
+          "name": "Postgres account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const stripe = $('Preparar Update').first().json;\nconst reserva = stripe.reserva;\nconst data = $('Preparar Query').first().json;\n\nconst fecha = new Date(data.fechas[0] + 'T12:00:00');\nconst fechaStr = fecha.toLocaleDateString('pt-PT', { \n  weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' \n});\nconst precio = (reserva.precio_total_centavos / 100).toFixed(2);\n\nconst msg = `✅ **Reserva criada com sucesso!**\n\n📦 **Produto:** ${reserva.producto_nombre}\n📋 **Plano:** ${reserva.plan_nombre}\n📅 **Data:** ${fechaStr}\n💰 **Total:** ${precio}€\n👤 **Nome:** ${reserva.cliente_nombre}\n📧 **Email:** ${reserva.cliente_email}\n\n💳 **Clica aqui para pagar:**\n${stripe.url}\n\n⏰ O link expira em 30 minutos.`;\n\nreturn [{ json: { response: msg } }];"
+      },
+      "id": "respuesta-exito",
+      "name": "Respuesta Éxito",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2288, -224]
+    },
+    {
+      "parameters": {
+        "jsCode": "const data = $('Preparar Query').first().json;\nreturn [{ json: { \n  response: `❌ Não encontrei um plano com preço de ${data.precio_centavos} centavos (${(data.precio_centavos/100).toFixed(2)}€).\\n\\nPor favor, consulta os preços disponíveis.`\n}}];"
+      },
+      "id": "no-encontrado",
+      "name": "No Encontrado",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [944, 0]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [$input.first()];"
+      },
+      "id": "retornar-error",
+      "name": "Retornar Error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [272, 112]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [[{ "node": "Validar Input", "type": "main", "index": 0 }]]
+    },
+    "Validar Input": {
+      "main": [[{ "node": "Tiene Error?", "type": "main", "index": 0 }]]
+    },
+    "Tiene Error?": {
+      "main": [
+        [{ "node": "Retornar Error", "type": "main", "index": 0 }],
+        [{ "node": "Preparar Query", "type": "main", "index": 0 }]
+      ]
+    },
+    "Preparar Query": {
+      "main": [[{ "node": "Buscar Producto y Plan", "type": "main", "index": 0 }]]
+    },
+    "Buscar Producto y Plan": {
+      "main": [[{ "node": "Encontrado?", "type": "main", "index": 0 }]]
+    },
+    "Encontrado?": {
+      "main": [
+        [{ "node": "Preparar Insert", "type": "main", "index": 0 }],
+        [{ "node": "No Encontrado", "type": "main", "index": 0 }]
+      ]
+    },
+    "Preparar Insert": {
+      "main": [[{ "node": "Crear Reserva DB", "type": "main", "index": 0 }]]
+    },
+    "Crear Reserva DB": {
+      "main": [[{ "node": "Preparar Stripe", "type": "main", "index": 0 }]]
+    },
+    "Preparar Stripe": {
+      "main": [[{ "node": "Stripe Checkout", "type": "main", "index": 0 }]]
+    },
+    "Stripe Checkout": {
+      "main": [[{ "node": "Preparar Update", "type": "main", "index": 0 }]]
+    },
+    "Preparar Update": {
+      "main": [[{ "node": "Guardar Stripe ID", "type": "main", "index": 0 }]]
+    },
+    "Guardar Stripe ID": {
+      "main": [[{ "node": "Respuesta Éxito", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c0ea27d5251deb5e73b2dc48638553d1f8433ec81eab200a330e2e4afeae37f4"
+  }
+}
